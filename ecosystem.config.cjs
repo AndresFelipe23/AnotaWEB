@@ -5,8 +5,8 @@ module.exports = {
   apps: [
     {
       name: 'anota-api',
-      script: 'dotnet',
-      args: 'run --project NotasApi',
+      script: '/bin/sh',
+      args: '-c "dotnet run --project NotasApi"',
       cwd: '/cloudclusters/Anota',
       instances: 1,
       exec_mode: 'fork',
