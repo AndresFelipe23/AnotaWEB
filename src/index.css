@@ -37,3 +37,444 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;  /* Chrome, Safari and Opera */
 }
+
+/* Estilos para EditorJS - Headers */
+.ce-header {
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 1em 0 0.5em 0;
+  color: #1f2937;
+}
+
+/* Estilos específicos para cada nivel de header usando los elementos HTML reales */
+.ce-header h1,
+.ce-header[data-level="1"] h1,
+.ce-header[data-level="1"] {
+  font-size: 2.5em !important;
+  font-weight: 800 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0.5em !important;
+  line-height: 1.1 !important;
+}
+
+.ce-header h2,
+.ce-header[data-level="2"] h2,
+.ce-header[data-level="2"] {
+  font-size: 2em !important;
+  font-weight: 700 !important;
+  margin-top: 0.5em !important;
+  margin-bottom: 0.5em !important;
+  line-height: 1.2 !important;
+}
+
+.ce-header h3,
+.ce-header[data-level="3"] h3,
+.ce-header[data-level="3"] {
+  font-size: 1.75em !important;
+  font-weight: 700 !important;
+  margin-top: 0.5em !important;
+  margin-bottom: 0.5em !important;
+  line-height: 1.3 !important;
+}
+
+.ce-header h4,
+.ce-header[data-level="4"] h4,
+.ce-header[data-level="4"] {
+  font-size: 1.5em !important;
+  font-weight: 600 !important;
+  margin-top: 0.5em !important;
+  margin-bottom: 0.5em !important;
+  line-height: 1.4 !important;
+}
+
+.ce-header h5,
+.ce-header[data-level="5"] h5,
+.ce-header[data-level="5"] {
+  font-size: 1.25em !important;
+  font-weight: 600 !important;
+  margin-top: 0.5em !important;
+  margin-bottom: 0.5em !important;
+  line-height: 1.4 !important;
+}
+
+.ce-header h6,
+.ce-header[data-level="6"] h6,
+.ce-header[data-level="6"] {
+  font-size: 1.1em !important;
+  font-weight: 600 !important;
+  margin-top: 0.5em !important;
+  margin-bottom: 0.5em !important;
+  line-height: 1.4 !important;
+}
+
+/* Estilos para el selector de niveles del header */
+.ce-toolbar__settings-btn {
+  color: #3b82f6 !important;
+  opacity: 1 !important;
+}
+
+.ce-toolbar__settings-btn:hover {
+  color: #2563eb !important;
+  background-color: #eff6ff !important;
+}
+
+/* Estilos para el menú de selección de niveles */
+.ce-popover__item[data-level] {
+  font-weight: 600;
+}
+
+.ce-popover__item[data-level="1"] {
+  font-size: 1.5em;
+}
+
+.ce-popover__item[data-level="2"] {
+  font-size: 1.25em;
+}
+
+.ce-popover__item[data-level="3"] {
+  font-size: 1.1em;
+}
+
+/* Asegurar que los headers se vean diferentes de los párrafos */
+.ce-paragraph {
+  font-size: 1.125rem !important; /* 18px - más grande */
+  line-height: 1.75 !important; /* Mejor espaciado */
+  font-weight: 400;
+  margin: 0.75em 0 !important;
+  color: #1f2937 !important;
+}
+
+/* Mejorar el editor principal */
+.codex-editor {
+  font-size: 1.125rem !important;
+  line-height: 1.75 !important;
+}
+
+.codex-editor__redactor {
+  padding: 0 !important;
+}
+
+/* Párrafos dentro del editor */
+.codex-editor p {
+  font-size: 1.125rem !important;
+  line-height: 1.75 !important;
+  margin: 0.75em 0 !important;
+  color: #1f2937 !important;
+}
+
+/* Mejorar el placeholder del editor */
+.codex-editor [contenteditable][data-placeholder]:empty::before {
+  content: attr(data-placeholder);
+  color: #9ca3af !important;
+  font-size: 1.125rem !important;
+  font-style: normal !important;
+}
+
+/* Listas dentro del editor */
+.codex-editor ul,
+.codex-editor ol {
+  font-size: 1.125rem !important;
+  line-height: 1.75 !important;
+  margin: 0.75em 0 !important;
+  padding-left: 1.5em !important;
+}
+
+.codex-editor li {
+  margin: 0.5em 0 !important;
+  line-height: 1.75 !important;
+}
+
+/* Citas dentro del editor */
+.codex-editor blockquote {
+  font-size: 1.125rem !important;
+  line-height: 1.75 !important;
+  margin: 1em 0 !important;
+  padding-left: 1.5em !important;
+  border-left: 3px solid #e5e7eb !important;
+  color: #4b5563 !important;
+}
+
+/* Código dentro del editor */
+.codex-editor code {
+  font-size: 0.95em !important;
+  padding: 0.2em 0.4em !important;
+  background-color: #f3f4f6 !important;
+  border-radius: 4px !important;
+}
+
+.codex-editor pre {
+  font-size: 0.95rem !important;
+  line-height: 1.6 !important;
+  margin: 1em 0 !important;
+  padding: 1em !important;
+  background-color: #f9fafb !important;
+  border-radius: 8px !important;
+  overflow-x: auto !important;
+}
+
+/* Mejorar el espaciado general del contenido del editor - ALINEAR A LA IZQUIERDA */
+.codex-editor__content {
+  max-width: 100% !important;
+}
+
+.codex-editor .ce-block__content {
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+/* Toolbar (botón + y menú) y bloques alineados a la izquierda - evita que el menú / salga al medio */
+.codex-editor .ce-toolbar__content {
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+/* Menú de bloques (/) y toolbox - alinear a la izquierda, no al centro */
+.codex-editor .ce-popover:not(.ce-popover--inline) {
+  left: 0 !important;
+  transform: none !important;
+}
+
+/* Estilos globales para headers dentro del editor */
+.codex-editor h1 {
+  font-size: 2.5em !important;
+  font-weight: 800 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0.5em !important;
+  line-height: 1.1 !important;
+  color: #1f2937 !important;
+}
+
+.codex-editor h2 {
+  font-size: 2em !important;
+  font-weight: 700 !important;
+  margin-top: 0.5em !important;
+  margin-bottom: 0.5em !important;
+  line-height: 1.2 !important;
+  color: #1f2937 !important;
+}
+
+.codex-editor h3 {
+  font-size: 1.75em !important;
+  font-weight: 700 !important;
+  margin-top: 0.5em !important;
+  margin-bottom: 0.5em !important;
+  line-height: 1.3 !important;
+  color: #1f2937 !important;
+}
+
+.codex-editor h4 {
+  font-size: 1.5em !important;
+  font-weight: 600 !important;
+  margin-top: 0.5em !important;
+  margin-bottom: 0.5em !important;
+  line-height: 1.4 !important;
+  color: #1f2937 !important;
+}
+
+.codex-editor h5 {
+  font-size: 1.25em !important;
+  font-weight: 600 !important;
+  margin-top: 0.5em !important;
+  margin-bottom: 0.5em !important;
+  line-height: 1.4 !important;
+  color: #1f2937 !important;
+}
+
+.codex-editor h6 {
+  font-size: 1.1em !important;
+  font-weight: 600 !important;
+  margin-top: 0.5em !important;
+  margin-bottom: 0.5em !important;
+  line-height: 1.4 !important;
+  color: #1f2937 !important;
+}
+
+/* Estilos para el menú de configuración del bloque */
+.ce-settings {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.ce-settings__button {
+  color: #374151;
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
+.ce-settings__button:hover {
+  background-color: #f3f4f6;
+}
+
+/* ========================================
+   EditorJS Toolbox / Slash menu (/)
+   Asegurar que el popover se muestre sobre los contenedores
+   ======================================== */
+
+/* El popover del toolbox (menú que aparece al escribir /) */
+.ce-popover {
+  z-index: 100 !important;
+  background: white !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  max-height: 340px !important;
+  overflow-y: auto !important;
+}
+
+/* Items dentro del menú / */
+.ce-popover-item {
+  padding: 8px 12px !important;
+  border-radius: 8px !important;
+  margin: 2px 4px !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.ce-popover-item:hover {
+  background-color: #f3f4f6 !important;
+}
+
+.ce-popover-item--focused {
+  background-color: #f0f0f0 !important;
+}
+
+.ce-popover-item__icon {
+  background: #f3f4f6 !important;
+  border-radius: 8px !important;
+  width: 32px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.ce-popover-item__title {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #1f2937 !important;
+}
+
+/* Barra de búsqueda dentro del popover */
+.ce-popover__search {
+  margin: 8px !important;
+}
+
+.ce-popover__search input {
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+  outline: none !important;
+}
+
+.ce-popover__search input:focus {
+  border-color: #000 !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Label "Sin resultados" */
+.ce-popover__nothing-found-message {
+  padding: 16px !important;
+  text-align: center !important;
+  color: #9ca3af !important;
+  font-size: 13px !important;
+}
+
+/* La toolbar principal (la barra lateral izquierda con + y tuerca) */
+.ce-toolbar {
+  z-index: 50 !important;
+}
+
+.ce-toolbar__plus {
+  color: #6b7280 !important;
+  background: white !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  width: 32px !important;
+  height: 32px !important;
+  transition: all 0.15s ease !important;
+}
+
+.ce-toolbar__plus:hover {
+  color: #000 !important;
+  border-color: #000 !important;
+  background: #f9fafb !important;
+}
+
+/* Evitar que el contenedor del editor recorte los popovers */
+.codex-editor {
+  overflow: visible !important;
+}
+
+.codex-editor__redactor {
+  overflow: visible !important;
+  padding-bottom: 100px !important;
+}
+
+/* Ocultar la inline toolbar popup de EditorJS (usamos toolbar fija) */
+.ce-inline-toolbar,
+.ce-popover--inline {
+  display: none !important;
+}
+
+/* Estilos para texto formateado dentro del editor */
+.codex-editor mark {
+  background-color: #fef08a !important;
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+.codex-editor code {
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 1px 4px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.875em;
+  color: #ef4444;
+}
+
+/* Estilos para el Delimiter - mostrar como línea divisoria en lugar de *** */
+.ce-delimiter {
+  margin: 2em 0 !important;
+  padding: 0 !important;
+  height: 1px !important;
+  border: none !important;
+  border-top: 1px solid #e5e7eb !important;
+  background: none !important;
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* Ocultar el texto *** del delimiter */
+.ce-delimiter .ce-delimiter__line,
+.ce-delimiter hr,
+.ce-delimiter::before,
+.ce-delimiter::after {
+  display: none !important;
+}
+
+/* Ocultar cualquier contenido de texto dentro del delimiter */
+.ce-delimiter * {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Estilos globales para delimiter dentro del editor */
+.codex-editor .ce-delimiter {
+  margin: 2em 0 !important;
+  padding: 0 !important;
+  height: 1px !important;
+  border: none !important;
+  border-top: 1px solid #d1d5db !important;
+  background: none !important;
+}
+
+.codex-editor .ce-delimiter hr {
+  display: none !important;
+}
+
+.codex-editor .ce-delimiter .ce-delimiter__line {
+  display: none !important;
+}

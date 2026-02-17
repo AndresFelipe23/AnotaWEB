@@ -46,6 +46,7 @@ export interface CrearCarpetaRequest {
 // Notas Types
 export interface NotaResumen {
   id: string;
+  carpetaId?: string | null;
   titulo: string;
   resumen?: string;
   icono?: string;
@@ -55,11 +56,20 @@ export interface NotaResumen {
   fechaActualizacion: string;
 }
 
+export interface Etiqueta {
+  id: string;
+  usuarioId: string;
+  nombre: string;
+  colorHex?: string;
+  fechaCreacion: string;
+}
+
 export interface Nota {
   id: string;
   usuarioId: string;
   carpetaId?: string;
   titulo: string;
+  etiquetas?: Etiqueta[];
   resumen?: string;
   icono?: string;
   imagenPortadaUrl?: string;

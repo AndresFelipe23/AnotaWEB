@@ -140,7 +140,7 @@ export const NotasRapidas = () => {
   };
 
   return (
-    <div className="w-full h-full flex items-center justify-center">
+    <div className="w-full h-full flex items-center justify-center pt-10">
       <div className="w-full max-w-5xl">
         {/* Título principal */}
         <div ref={titleRef} className="mb-10">

@@ -4,6 +4,11 @@ import { Login } from './components/Login';
 import { Register } from './components/Register';
 import { Home } from './components/Home';
 import { NotasRapidasPage } from './components/NotasRapidasPage';
+import { NotasPage } from './components/NotasPage';
+import { CarpetasPage } from './components/CarpetasPage';
+import { TareasPage } from './components/TareasPage';
+import { DashboardPage } from './components/DashboardPage';
+import { LandingPage } from './components/LandingPage';
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -28,14 +33,19 @@ function App() {
       <Routes>
         {!isAuthenticated ? (
           <>
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login onToggleMode={() => {}} />} />
             <Route path="/register" element={<Register onToggleMode={() => {}} />} />
-            <Route path="*" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </>
         ) : (
           <>
             <Route path="/" element={<Home />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/notas-rapidas" element={<NotasRapidasPage />} />
+            <Route path="/notas" element={<NotasPage />} />
+            <Route path="/carpetas" element={<CarpetasPage />} />
+            <Route path="/tareas" element={<TareasPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </>
         )}

@@ -18,9 +18,10 @@ import type {
   NotaResumen,
   NotaRapida,
   Tarea,
+  Etiqueta,
 } from '../types/api';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7251';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5246';
 
 // Debug: verificar que la URL se está leyendo correctamente
 if (import.meta.env.DEV) {
@@ -115,8 +116,10 @@ class ApiService {
   }
 
   // ============ NOTAS ============
-  async obtenerNotas(carpetaId?: string): Promise<NotaResumen[]> {
-    const params = carpetaId ? { carpetaId } : {};
+  async obtenerNotas(carpetaId?: string, todas = false): Promise<NotaResumen[]> {
+    const params: Record<string, string | boolean> = {};
+    if (todas) params.todas = true;
+    else if (carpetaId) params.carpetaId = carpetaId;
     const response = await this.api.get<NotaResumen[]>('/api/notas', { params });
     return response.data;
   }
@@ -124,6 +127,29 @@ class ApiService {
   async obtenerNotaPorId(id: string): Promise<Nota> {
     const response = await this.api.get<Nota>(`/api/notas/${id}`);
     return response.data;
+  }
+
+  // ============ ETIQUETAS ============
+  async obtenerEtiquetas(): Promise<Etiqueta[]> {
+    const response = await this.api.get<Etiqueta[]>('/api/etiquetas');
+    return response.data;
+  }
+
+  async crearEtiqueta(data: { nombre: string; colorHex?: string }): Promise<{ id: string }> {
+    const response = await this.api.post<{ id: string }>('/api/etiquetas', data);
+    return response.data;
+  }
+
+  async actualizarEtiqueta(id: string, data: { nombre: string; colorHex?: string }): Promise<void> {
+    await this.api.put(`/api/etiquetas/${id}`, data);
+  }
+
+  async eliminarEtiqueta(id: string): Promise<void> {
+    await this.api.delete(`/api/etiquetas/${id}`);
+  }
+
+  async asignarEtiquetasANota(notaId: string, etiquetaIds: string[]): Promise<void> {
+    await this.api.put(`/api/notas/${notaId}/etiquetas`, { etiquetaIds });
   }
 
   async crearNota(data: CrearNotaRequest): Promise<{ id: string }> {
@@ -147,9 +173,27 @@ class ApiService {
     await this.api.put(`/api/notas/${id}/archivar`);
   }
 
+  async obtenerNotasArchivadas(): Promise<NotaResumen[]> {
+    const response = await this.api.get<NotaResumen[]>('/api/notas/archivadas');
+    return response.data;
+  }
+
+  async recuperarNota(id: string): Promise<void> {
+    await this.api.put(`/api/notas/${id}/recuperar`);
+  }
+
+  async eliminarNota(id: string): Promise<void> {
+    await this.api.delete(`/api/notas/${id}`);
+  }
+
   // ============ NOTAS RÁPIDAS ============
   async obtenerNotasRapidas(): Promise<NotaRapida[]> {
     const response = await this.api.get<NotaRapida[]>('/api/NotasRapidas');
+    return response.data;
+  }
+
+  async obtenerNotasRapidasArchivadas(): Promise<NotaRapida[]> {
+    const response = await this.api.get<NotaRapida[]>('/api/NotasRapidas/archivadas');
     return response.data;
   }
 
@@ -166,6 +210,10 @@ class ApiService {
     await this.api.put(`/api/NotasRapidas/${id}/archivar`);
   }
 
+  async recuperarNotaRapida(id: string): Promise<void> {
+    await this.api.put(`/api/NotasRapidas/${id}/recuperar`);
+  }
+
   async eliminarNotaRapida(id: string): Promise<void> {
     await this.api.delete(`/api/NotasRapidas/${id}`);
   }
@@ -178,6 +226,11 @@ class ApiService {
   // ============ TAREAS ============
   async obtenerTareasPendientes(): Promise<Tarea[]> {
     const response = await this.api.get<Tarea[]>('/api/tareas/pendientes');
+    return response.data;
+  }
+
+  async obtenerTareasCompletadas(): Promise<Tarea[]> {
+    const response = await this.api.get<Tarea[]>('/api/tareas/completadas');
     return response.data;
   }
 

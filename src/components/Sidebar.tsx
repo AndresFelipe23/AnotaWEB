@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import logoSvg from '../assets/logo.svg';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -18,10 +19,8 @@ export const Sidebar = ({ isCollapsed, onToggle }: SidebarProps) => {
         {/* Navbar dentro del sidebar para que esté por encima */}
         <div className="h-16 border-b border-gray-200 flex items-center px-4">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-black rounded-xl flex items-center justify-center shadow-sm">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
+            <div className="w-9 h-9 flex items-center justify-center overflow-hidden">
+              <img src={logoSvg} alt="Anota logo" className="w-7 h-7 object-contain" />
             </div>
             {!isCollapsed && <h1 className="text-xl font-bold text-black">Anota</h1>}
           </div>
@@ -43,6 +42,19 @@ export const Sidebar = ({ isCollapsed, onToggle }: SidebarProps) => {
           </Link>
 
           <Link
+            to="/dashboard"
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-100 transition-all duration-200 ${
+              isCollapsed ? 'justify-center' : ''
+            } ${location.pathname === '/dashboard' ? 'bg-gray-100' : ''}`}
+            title="Dashboard"
+          >
+            <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12h4v8H3v-8zm7-6h4v14h-4V6zm7 10h4v4h-4v-4z" />
+            </svg>
+            {!isCollapsed && <span className="text-sm font-medium text-gray-700">Dashboard</span>}
+          </Link>
+
+          <Link
             to="/notas-rapidas"
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-100 transition-all duration-200 ${
               isCollapsed ? 'justify-center' : ''
@@ -55,44 +67,44 @@ export const Sidebar = ({ isCollapsed, onToggle }: SidebarProps) => {
             {!isCollapsed && <span className="text-sm font-medium text-gray-700">Ver Notas Rápidas</span>}
           </Link>
 
-          <a
-            href="#"
+          <Link
+            to="/notas"
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-100 transition-all duration-200 ${
               isCollapsed ? 'justify-center' : ''
-            }`}
+            } ${location.pathname === '/notas' ? 'bg-gray-100' : ''}`}
             title="Notas"
           >
             <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             {!isCollapsed && <span className="text-sm font-medium text-gray-700">Notas</span>}
-          </a>
+          </Link>
 
-          <a
-            href="#"
+          <Link
+            to="/tareas"
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-100 transition-all duration-200 ${
               isCollapsed ? 'justify-center' : ''
-            }`}
+            } ${location.pathname === '/tareas' ? 'bg-gray-100' : ''}`}
             title="Tareas"
           >
             <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
             </svg>
             {!isCollapsed && <span className="text-sm font-medium text-gray-700">Tareas</span>}
-          </a>
+          </Link>
 
-          <a
-            href="#"
+          <Link
+            to="/carpetas"
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-100 transition-all duration-200 ${
               isCollapsed ? 'justify-center' : ''
-            }`}
+            } ${location.pathname === '/carpetas' ? 'bg-gray-100' : ''}`}
             title="Carpetas"
           >
             <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
             </svg>
             {!isCollapsed && <span className="text-sm font-medium text-gray-700">Carpetas</span>}
-          </a>
+          </Link>
         </nav>
 
         {/* Divider */}

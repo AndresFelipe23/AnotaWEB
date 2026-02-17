@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import logoSvg from '../assets/logo.svg';
 
 interface LoginProps {
   onToggleMode: () => void;
@@ -31,10 +32,8 @@ export const Login = (_props: LoginProps) => {
       <div className="w-full max-w-md">
         {/* Logo y Título */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-black rounded-2xl mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
+          <div className="inline-flex items-center justify-center w-16 h-16 mb-4 overflow-hidden">
+            <img src={logoSvg} alt="Anota logo" className="w-12 h-12 object-contain" />
           </div>
           <h1 className="text-3xl font-bold text-black mb-2">Bienvenido a Anota</h1>
           <p className="text-gray-600 text-sm">Organiza tus ideas y pensamientos</p>
@@ -115,9 +114,18 @@ export const Login = (_props: LoginProps) => {
         </div>
 
         {/* Footer */}
-        <p className="mt-6 text-center text-xs text-gray-500">
-          Al continuar, aceptas nuestros términos de servicio y política de privacidad
-        </p>
+        <div className="mt-6 text-center space-y-2">
+          <p className="text-xs text-gray-500">
+            Al continuar, aceptas nuestros términos de servicio y política de privacidad
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="text-xs font-medium text-gray-600 hover:text-black underline underline-offset-2"
+          >
+            ← Volver al inicio
+          </button>
+        </div>
       </div>
     </div>
   );

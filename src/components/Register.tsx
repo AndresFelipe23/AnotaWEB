@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import logoSvg from '../assets/logo.svg';
 
 interface RegisterProps {
   onToggleMode: () => void;
@@ -46,10 +47,8 @@ export const Register = (_props: RegisterProps) => {
       <div className="w-full max-w-md">
         {/* Logo y Título */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-black rounded-2xl mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-            </svg>
+          <div className="inline-flex items-center justify-center w-16 h-16 mb-4 overflow-hidden">
+            <img src={logoSvg} alt="Anota logo" className="w-12 h-12 object-contain" />
           </div>
           <h1 className="text-3xl font-bold text-black mb-2">Crea tu cuenta</h1>
           <p className="text-gray-600 text-sm">Únete a Anota y comienza a organizar tus ideas</p>
@@ -186,9 +185,18 @@ export const Register = (_props: RegisterProps) => {
         </div>
 
         {/* Footer */}
-        <p className="mt-6 text-center text-xs text-gray-500">
-          Al registrarte, aceptas nuestros términos de servicio y política de privacidad
-        </p>
+        <div className="mt-6 text-center space-y-2">
+          <p className="text-xs text-gray-500">
+            Al registrarte, aceptas nuestros términos de servicio y política de privacidad
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="text-xs font-medium text-gray-600 hover:text-black underline underline-offset-2"
+          >
+            ← Volver al inicio
+          </button>
+        </div>
       </div>
     </div>
   );
