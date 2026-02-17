@@ -1,73 +1,115 @@
-# React + TypeScript + Vite
+# AnotaWEB
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicación web frontend para **Anota**, una plataforma de notas, tareas y carpetas con autenticación JWT.
 
-Currently, two official plugins are available:
+## Stack tecnológico
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React 19** + **TypeScript**
+- **Vite 7** (build y dev server)
+- **React Router 7**
+- **TailwindCSS 4**
+- **Editor.js** – editor de bloques para notas
+- **axios** – cliente HTTP
+- **iziToast** – notificaciones
+- **GSAP** – animaciones
 
-## React Compiler
+## Estructura del proyecto
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── components/          # Componentes React
+│   ├── BlockEditor.tsx  # Editor de bloques (Editor.js)
+│   ├── DashboardPage.tsx
+│   ├── NotasPage.tsx    # Notas completas con carpetas
+│   ├── NotasRapidasPage.tsx
+│   ├── TareasPage.tsx
+│   ├── CarpetasPage.tsx
+│   ├── Login.tsx / Register.tsx
+│   ├── LandingPage.tsx
+│   └── ...
+├── contexts/
+│   └── AuthContext.tsx  # Autenticación y sesión
+├── services/
+│   └── api.ts           # Cliente API (axios)
+├── types/
+│   └── api.ts           # Tipos TypeScript
+└── main.tsx
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Desarrollo
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Requisitos
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- **Bun** o **Node.js** 18+
+- API backend (NotasApi) en ejecución
+
+### Instalación
+
+```bash
+bun install
+# o
+npm install
 ```
+
+### Variables de entorno
+
+Crea un archivo `.env` en la raíz:
+
+```env
+VITE_API_URL=http://localhost:5246
+```
+
+Para producción, usa `.env.production`:
+
+```env
+VITE_API_URL=https://anotaweb.work
+```
+
+### Ejecutar en desarrollo
+
+```bash
+bun run dev
+# o
+npm run dev
+```
+
+La app se abre en `http://localhost:5173`.
+
+### Build de producción
+
+```bash
+bun run build
+# o
+npm run build
+```
+
+El resultado se genera en `dist/`.
+
+### Vista previa del build
+
+```bash
+bun run preview
+# o
+npm run preview
+```
+
+## Despliegue
+
+- **Dominio:** anota.click  
+- **API:** anotaweb.work  
+
+El build (`dist/`) puede desplegarse en cualquier hosting estático (Vercel, Netlify, S3, etc.) o en el mismo servidor donde corre la API.
+
+## Funcionalidades principales
+
+- Inicio de sesión y registro
+- **Notas completas** con editor de bloques (párrafos, listas, tablas, código, imágenes)
+- **Notas rápidas** para capturar ideas rápido
+- **Carpetas** para organizar notas
+- **Tareas** con prioridad y fechas de vencimiento
+- **Dashboard** con resumen de tareas pendientes
+- Soporte para favoritos y archivado
+
+## Integración con la API
+
+Ver [README_API.md](./README_API.md) para configuración del cliente API, endpoints y uso de `apiService` y `AuthContext`.
