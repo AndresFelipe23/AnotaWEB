@@ -13,6 +13,9 @@ export const CarpetasPage = () => {
   const [carpetaPadreId, setCarpetaPadreId] = useState<string | null>(null);
   const [nombrePadre, setNombrePadre] = useState('');
   const [eliminandoId, setEliminandoId] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [carpetaAEliminarId, setCarpetaAEliminarId] = useState<string | null>(null);
+  const [carpetaAEliminarNombre, setCarpetaAEliminarNombre] = useState<string>('');
 
   const cargarCarpetas = async () => {
     try {
@@ -75,52 +78,35 @@ export const CarpetasPage = () => {
     }
   };
 
-  const handleEliminar = (id: string, nombre: string) => {
-    iziToast.show({
-      title: 'Eliminar carpeta',
-      message: `¿Eliminar la carpeta "${nombre}" y todas sus subcarpetas? Las notas quedarán sin carpeta.`,
-      position: 'topRight',
-      color: 'red',
-      timeout: false,
-      close: true,
-      overlay: true,
-      overlayClose: false,
-      closeOnEscape: true,
-      buttons: [
-        [
-          '<button class="iziToast-btn-yes">Eliminar</button>',
-          async (instance: any, toast: any) => {
-            instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
-            setEliminandoId(id);
-            try {
-              await apiService.eliminarCarpeta(id);
-              await cargarCarpetas();
-              iziToast.success({
-                title: 'Carpeta eliminada',
-                message: 'Las notas quedaron sin carpeta',
-                position: 'topRight',
-              });
-            } catch (error: any) {
-              iziToast.error({
-                title: 'Error',
-                message: error?.response?.data?.message || 'No se pudo eliminar la carpeta',
-                position: 'topRight',
-              });
-            } finally {
-              setEliminandoId(null);
-            }
-          },
-          true,
-        ],
-        [
-          '<button class="iziToast-btn-no">Cancelar</button>',
-          (instance: any, toast: any) => {
-            instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
-          },
-          false,
-        ],
-      ],
-    });
+  const handleSolicitarEliminar = (id: string, nombre: string) => {
+    setCarpetaAEliminarId(id);
+    setCarpetaAEliminarNombre(nombre);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmarEliminar = async () => {
+    if (!carpetaAEliminarId) return;
+    try {
+      setEliminandoId(carpetaAEliminarId);
+      await apiService.eliminarCarpeta(carpetaAEliminarId);
+      await cargarCarpetas();
+      setShowDeleteConfirm(false);
+      setCarpetaAEliminarId(null);
+      setCarpetaAEliminarNombre('');
+      iziToast.success({
+        title: 'Carpeta eliminada',
+        message: 'Las notas quedaron sin carpeta',
+        position: 'topRight',
+      });
+    } catch (error: any) {
+      iziToast.error({
+        title: 'Error',
+        message: error?.response?.data?.message || 'No se pudo eliminar la carpeta',
+        position: 'topRight',
+      });
+    } finally {
+      setEliminandoId(null);
+    }
   };
 
   return (
@@ -288,7 +274,7 @@ export const CarpetasPage = () => {
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleEliminar(c.id, c.nombre)}
+                    onClick={() => handleSolicitarEliminar(c.id, c.nombre)}
                     disabled={eliminandoId === c.id}
                     className="p-2 rounded-lg hover:bg-red-100 text-gray-500 hover:text-red-600 disabled:opacity-50 transition-colors touch-manipulation"
                     title="Eliminar"
@@ -309,6 +295,38 @@ export const CarpetasPage = () => {
             ))}
             </ul>
           </div>
+        )}
+
+        {/* Modal confirmar eliminar */}
+        {showDeleteConfirm && (
+          <>
+            <div className="fixed inset-0 bg-black/40 z-[200]" onClick={() => { setShowDeleteConfirm(false); setCarpetaAEliminarId(null); setCarpetaAEliminarNombre(''); }} aria-hidden="true" />
+            <div className="fixed inset-0 z-[210] flex items-center justify-center p-4">
+              <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Eliminar carpeta</h3>
+                <p className="text-sm text-gray-600 mb-6">
+                  ¿Eliminar la carpeta "{carpetaAEliminarNombre}" y todas sus subcarpetas? Las notas quedarán sin carpeta. Esta acción no se puede deshacer.
+                </p>
+                <div className="flex gap-3 justify-end">
+                  <button
+                    type="button"
+                    onClick={() => { setShowDeleteConfirm(false); setCarpetaAEliminarId(null); setCarpetaAEliminarNombre(''); }}
+                    className="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 touch-manipulation"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleConfirmarEliminar}
+                    disabled={eliminandoId !== null}
+                    className="px-4 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                  >
+                    {eliminandoId ? 'Eliminando...' : 'Eliminar'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
         )}
       </div>
     </Layout>
