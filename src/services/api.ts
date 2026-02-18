@@ -21,7 +21,7 @@ import type {
   Etiqueta,
 } from '../types/api';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5246';
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Debug: verificar que la URL se está leyendo correctamente
 if (import.meta.env.DEV) {
