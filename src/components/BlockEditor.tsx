@@ -172,7 +172,7 @@ export const BlockEditor = forwardRef<BlockEditorRef, BlockEditorProps>(({ value
       const List = (await import('@editorjs/list')).default;
       const Checklist = (await import('@editorjs/checklist')).default as any;
       const Quote = (await import('@editorjs/quote')).default;
-      const Code = (await import('@editorjs/code')).default;
+      const CodeBlock = (await import('./CodeBlock')).default;
       const InlineCode = (await import('@editorjs/inline-code')).default;
       const Marker = (await import('@editorjs/marker')).default as any;
       const LinkTool = (await import('@editorjs/link')).default as any;
@@ -274,7 +274,7 @@ export const BlockEditor = forwardRef<BlockEditorRef, BlockEditorProps>(({ value
               inlineToolbar: allInlineTools,
               config: { quotePlaceholder: 'Escribe una cita', captionPlaceholder: 'Autor o fuente' },
             },
-            code: { class: Code, config: { placeholder: 'Escribe tu código aquí...' } },
+            code: { class: CodeBlock },
             table: {
               class: Table as any,
               inlineToolbar: allInlineTools,

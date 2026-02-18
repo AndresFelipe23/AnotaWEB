@@ -25,12 +25,6 @@ const API_URL =
   import.meta.env.VITE_API_URL
   || (import.meta.env.PROD ? 'https://anotaweb.work' : 'http://localhost:5246');
 
-// Debug: verificar que la URL se está leyendo correctamente
-if (import.meta.env.DEV) {
-  console.log('🔧 API_URL:', API_URL);
-  console.log('🔧 VITE_API_URL desde env:', import.meta.env.VITE_API_URL);
-}
-
 class ApiService {
   private api: AxiosInstance;
 

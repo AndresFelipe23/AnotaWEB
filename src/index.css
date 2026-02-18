@@ -472,17 +472,174 @@ body {
 /* Estilos globales para delimiter dentro del editor */
 .codex-editor .ce-delimiter {
   margin: 2em 0 !important;
-  padding: 0 !important;
-  height: 1px !important;
+}
+
+/* Estilos para el bloque de código personalizado */
+.custom-code-block {
+  margin: 1em 0 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  border: 1px solid #2d2d2d !important;
+  background: #1e1e1e !important;
+}
+
+.code-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #1e1e1e;
+  border-bottom: 1px solid #333;
+  border-radius: 8px 8px 0 0;
+}
+
+.code-block-lang-select {
+  background: #2d2d2d;
+  color: #d4d4d4;
+  border: 1px solid #3e3e3e;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  outline: none;
+}
+
+.code-block-lang-select:hover {
+  background: #3d3d3d;
+  border-color: #4d4d4d;
+}
+
+.code-block-lang-select:focus {
+  border-color: #5d5d5d;
+  box-shadow: 0 0 0 2px rgba(93, 93, 93, 0.2);
+}
+
+.code-block-copy-btn {
+  display: flex;
+  align-items: center;
+  background: #2d2d2d;
+  color: #d4d4d4;
+  border: 1px solid #3e3e3e;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.code-block-copy-btn:hover {
+  background: #3d3d3d;
+  border-color: #4d4d4d;
+}
+
+.code-block-container {
+  position: relative;
+}
+
+.custom-code-block pre {
+  margin: 0 !important;
+  padding: 16px !important;
+  background: #1e1e1e !important;
+  border-radius: 0 0 8px 8px !important;
+  overflow-x: auto !important;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  color: #d4d4d4 !important;
   border: none !important;
-  border-top: 1px solid #d1d5db !important;
-  background: none !important;
 }
 
-.codex-editor .ce-delimiter hr {
-  display: none !important;
+.custom-code-block code {
+  background: transparent !important;
+  padding: 0 !important;
+  border: none !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
 }
 
-.codex-editor .ce-delimiter .ce-delimiter__line {
-  display: none !important;
+/* Asegurar que los tokens de Prism tengan colores - NO sobrescribir con color general */
+.custom-code-block code[class*="language-"] {
+  color: #d4d4d4;
+}
+
+/* Los tokens individuales deben tener sus propios colores */
+.custom-code-block code[class*="language-"] .token {
+  color: inherit;
+}
+
+.custom-code-block textarea {
+  background: #1e1e1e !important;
+  color: #d4d4d4 !important;
+  border: none !important;
+  padding: 16px !important;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  resize: vertical !important;
+  min-height: 150px !important;
+  border-radius: 0 0 8px 8px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.custom-code-block textarea:focus {
+  outline: none !important;
+}
+
+/* Estilos de Prism.js para resaltado de sintaxis - NO usar !important para permitir que los estilos inline tengan prioridad */
+/* Los colores se aplican via JavaScript con estilos inline, estos son solo fallback */
+.custom-code-block code[class*="language-"] .token.comment,
+.custom-code-block code[class*="language-"] .token.prolog,
+.custom-code-block code[class*="language-"] .token.doctype,
+.custom-code-block code[class*="language-"] .token.cdata {
+  color: #6a9955;
+}
+
+.custom-code-block code[class*="language-"] .token.punctuation {
+  color: #d4d4d4;
+}
+
+.custom-code-block code[class*="language-"] .token.property,
+.custom-code-block code[class*="language-"] .token.tag,
+.custom-code-block code[class*="language-"] .token.boolean,
+.custom-code-block code[class*="language-"] .token.number,
+.custom-code-block code[class*="language-"] .token.constant,
+.custom-code-block code[class*="language-"] .token.symbol,
+.custom-code-block code[class*="language-"] .token.deleted {
+  color: #569cd6;
+}
+
+.custom-code-block code[class*="language-"] .token.selector,
+.custom-code-block code[class*="language-"] .token.attr-name,
+.custom-code-block code[class*="language-"] .token.string,
+.custom-code-block code[class*="language-"] .token.char,
+.custom-code-block code[class*="language-"] .token.builtin,
+.custom-code-block code[class*="language-"] .token.inserted {
+  color: #ce9178;
+}
+
+.custom-code-block code[class*="language-"] .token.operator,
+.custom-code-block code[class*="language-"] .token.entity,
+.custom-code-block code[class*="language-"] .token.url,
+.custom-code-block code[class*="language-"].language-css .token.string,
+.custom-code-block code[class*="language-"].style .token.string {
+  color: #d4d4d4;
+}
+
+.custom-code-block code[class*="language-"] .token.atrule,
+.custom-code-block code[class*="language-"] .token.attr-value,
+.custom-code-block code[class*="language-"] .token.keyword {
+  color: #569cd6;
+}
+
+.custom-code-block code[class*="language-"] .token.function,
+.custom-code-block code[class*="language-"] .token.class-name {
+  color: #dcdcaa;
+}
+
+.custom-code-block code[class*="language-"] .token.regex,
+.custom-code-block code[class*="language-"] .token.important,
+.custom-code-block code[class*="language-"] .token.variable {
+  color: #d4d4d4;
 }

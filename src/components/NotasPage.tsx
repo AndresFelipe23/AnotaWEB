@@ -464,7 +464,7 @@ export const NotasPage = () => {
 
   return (
     <Layout>
-      <div className="w-full min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
+      <div className="w-full h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex-shrink-0 border-b border-gray-200 bg-white px-4 sm:px-6 py-3">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
