@@ -21,7 +21,9 @@ import type {
   Etiqueta,
 } from '../types/api';
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL =
+  import.meta.env.VITE_API_URL
+  || (import.meta.env.PROD ? 'https://anotaweb.work' : 'http://localhost:5246');
 
 // Debug: verificar que la URL se está leyendo correctamente
 if (import.meta.env.DEV) {
