@@ -75,22 +75,52 @@ export const CarpetasPage = () => {
     }
   };
 
-  const handleEliminar = async (id: string, nombre: string) => {
-    if (!window.confirm(`¿Eliminar la carpeta "${nombre}" y todas sus subcarpetas? Las notas quedarán sin carpeta.`)) return;
-    try {
-      setEliminandoId(id);
-      await apiService.eliminarCarpeta(id);
-      await cargarCarpetas();
-      iziToast.success({ title: 'Eliminada', message: 'Carpeta eliminada', position: 'topRight' });
-    } catch (error: any) {
-      iziToast.error({
-        title: 'Error',
-        message: error?.response?.data?.message || 'No se pudo eliminar la carpeta',
-        position: 'topRight',
-      });
-    } finally {
-      setEliminandoId(null);
-    }
+  const handleEliminar = (id: string, nombre: string) => {
+    iziToast.show({
+      title: 'Eliminar carpeta',
+      message: `¿Eliminar la carpeta "${nombre}" y todas sus subcarpetas? Las notas quedarán sin carpeta.`,
+      position: 'topRight',
+      color: 'red',
+      timeout: false,
+      close: true,
+      overlay: true,
+      overlayClose: false,
+      closeOnEscape: true,
+      buttons: [
+        [
+          '<button class="iziToast-btn-yes">Eliminar</button>',
+          async (instance: any, toast: any) => {
+            instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+            setEliminandoId(id);
+            try {
+              await apiService.eliminarCarpeta(id);
+              await cargarCarpetas();
+              iziToast.success({
+                title: 'Carpeta eliminada',
+                message: 'Las notas quedaron sin carpeta',
+                position: 'topRight',
+              });
+            } catch (error: any) {
+              iziToast.error({
+                title: 'Error',
+                message: error?.response?.data?.message || 'No se pudo eliminar la carpeta',
+                position: 'topRight',
+              });
+            } finally {
+              setEliminandoId(null);
+            }
+          },
+          true,
+        ],
+        [
+          '<button class="iziToast-btn-no">Cancelar</button>',
+          (instance: any, toast: any) => {
+            instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+          },
+          false,
+        ],
+      ],
+    });
   };
 
   return (
