@@ -140,10 +140,6 @@ export const BlockEditor = forwardRef<BlockEditorRef, BlockEditorProps>(({ value
       return;
     }
 
-    if (initTimeoutId) {
-      clearTimeout(initTimeoutId);
-    }
-
     notaIdRef.current = notaId;
     valueRef.current = value;
 
