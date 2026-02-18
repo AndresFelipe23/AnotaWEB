@@ -48,35 +48,41 @@ export const Navbar = ({ onMenuClick, isSidebarCollapsed = false }: NavbarProps)
     navigate(`/notas?open=${id}`);
   };
 
-  // Calcular el margen izquierdo del navbar basado en el estado del sidebar
-  const sidebarWidth = isSidebarCollapsed ? 64 : 256;
-
   return (
-    <nav 
-      className="fixed top-0 h-16 bg-white border-b border-gray-200 z-40 transition-all duration-300"
-      style={{
-        left: `${sidebarWidth}px`,
-        right: 0,
-      }}
+    <nav
+      className={`fixed top-0 left-0 right-0 h-14 sm:h-16 bg-white border-b border-gray-200 z-40 transition-all duration-300 ${
+        isSidebarCollapsed ? 'lg:left-16' : 'lg:left-64'
+      }`}
     >
-      <div className="flex items-center justify-between h-full px-6">
-        {/* Left: Menu Button */}
-        <div className="flex items-center gap-4">
+      <div className="flex items-center justify-between h-full px-3 sm:px-4 md:px-6 gap-2">
+        {/* Left: Menu Button + Logo on mobile */}
+        <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           <button
             onClick={onMenuClick}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors lg:hidden"
-            aria-label="Toggle menu"
+            className="flex-shrink-0 p-2.5 -ml-1 rounded-xl hover:bg-gray-100 active:bg-gray-200 transition-colors lg:hidden touch-manipulation"
+            aria-label="Abrir menú"
           >
             <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
+          <span className="lg:hidden text-base font-bold text-black truncate">Anota</span>
         </div>
 
-        {/* Right: User Info and Actions */}
-        <div className="flex items-center gap-4">
-          {/* Search (hidden on mobile) */}
-          <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl hover:border-gray-300 transition-colors">
+        {/* Right: Search, User, Actions */}
+        <div className="flex items-center gap-1 sm:gap-2 md:gap-4">
+          {/* Search: icon on mobile, full on md+ */}
+          <button
+            type="button"
+            onClick={() => setIsSearchOpen(true)}
+            className="md:hidden flex-shrink-0 p-2.5 rounded-xl hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
+            aria-label="Buscar"
+          >
+            <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
+          <div className="hidden md:flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl hover:border-gray-300 transition-colors flex-1 max-w-xs">
             <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
@@ -102,17 +108,15 @@ export const Navbar = ({ onMenuClick, isSidebarCollapsed = false }: NavbarProps)
           </div>
 
           {/* User Info */}
-          <div className="hidden sm:flex items-center gap-3">
-            <div className="text-right">
-              <p className="text-sm font-semibold text-black">
-                {usuario?.nombre} {usuario?.apellido}
-              </p>
-              <p className="text-xs text-gray-500">{usuario?.correo}</p>
-            </div>
+          <div className="hidden sm:block min-w-0">
+            <p className="text-sm font-semibold text-black truncate">
+              {usuario?.nombre} {usuario?.apellido}
+            </p>
+            <p className="text-xs text-gray-500 truncate">{usuario?.correo}</p>
           </div>
 
           {/* User Avatar */}
-          <div className="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-300">
+          <div className="flex-shrink-0 w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-300">
             <span className="text-sm font-semibold text-gray-700">
               {usuario?.nombre?.charAt(0).toUpperCase()}
             </span>
@@ -121,8 +125,9 @@ export const Navbar = ({ onMenuClick, isSidebarCollapsed = false }: NavbarProps)
           {/* Logout Button */}
           <button
             onClick={logout}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            className="flex-shrink-0 p-2.5 rounded-xl hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
             title="Cerrar sesión"
+            aria-label="Cerrar sesión"
           >
             <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -130,9 +135,9 @@ export const Navbar = ({ onMenuClick, isSidebarCollapsed = false }: NavbarProps)
           </button>
         </div>
       </div>
-      {/* Search modal */}
+      {/* Search modal - full screen on mobile */}
       {isSearchOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-20">
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-14 sm:pt-20 pb-safe">
           <div
             className="absolute inset-0 bg-black/30"
             onClick={() => {
@@ -142,29 +147,44 @@ export const Navbar = ({ onMenuClick, isSidebarCollapsed = false }: NavbarProps)
             }}
           />
           <div
-            className="relative bg-white rounded-2xl shadow-xl border border-gray-200 w-full max-w-xl mx-4"
+            className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-xl border border-gray-200 w-full max-w-xl sm:mx-4 max-h-[85vh] sm:max-h-[80vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-[0.16em]">
-                Resultados de búsqueda
-              </p>
-              <button
+            <div className="px-4 py-3 border-b border-gray-100 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-[0.16em]">
+                  Buscar notas
+                </p>
+                <button
                 type="button"
                 onClick={() => {
                   setIsSearchOpen(false);
                   setSearch('');
                   setResults([]);
                 }}
-                className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500"
-                aria-label="Cerrar búsqueda"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  className="p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 text-gray-500 touch-manipulation"
+                  aria-label="Cerrar búsqueda"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="md:hidden flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+                <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-              </button>
+                <input
+                  type="text"
+                  placeholder="Buscar notas..."
+                  className="flex-1 bg-transparent border-none outline-none text-sm text-gray-700 placeholder-gray-400 min-w-0"
+                  value={search}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  autoFocus
+                />
+              </div>
             </div>
-            <div className="max-h-80 overflow-y-auto py-2">
+            <div className="flex-1 min-h-0 overflow-y-auto py-2 max-h-60 sm:max-h-80">
               {!search.trim() && (
                 <p className="px-4 py-3 text-xs text-gray-500">
                   Escribe para buscar en los títulos y resúmenes de tus notas.

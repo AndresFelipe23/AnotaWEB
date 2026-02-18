@@ -273,7 +273,7 @@ export const ListaNotasRapidas = () => {
 
   if (isLoading) {
     return (
-      <div className="w-full max-w-7xl mx-auto">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-10">
           <div className="flex items-center justify-between mb-6">
             <div className="flex-1">
@@ -306,12 +306,12 @@ export const ListaNotasRapidas = () => {
   }
 
   return (
-    <div className="w-full h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
+    <div className="w-full min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
       {/* Header Compacto */}
-      <div className="flex-shrink-0 border-b-2 border-gray-100 bg-white px-8 py-3 shadow-sm">
-        <div className="flex items-center justify-between gap-4">
+      <div className="flex-shrink-0 border-b-2 border-gray-100 bg-white px-4 sm:px-6 lg:px-8 py-3 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-semibold text-black" style={{ fontFamily: "'Inter', sans-serif", letterSpacing: '-0.03em' }}>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-black" style={{ fontFamily: "'Inter', sans-serif", letterSpacing: '-0.03em' }}>
               Notas Rápidas
             </h1>
             {notas.length > 0 && (
@@ -320,10 +320,10 @@ export const ListaNotasRapidas = () => {
               </span>
             )}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             <button
               onClick={handleToggleArchivadasPanel}
-              className={`px-4 py-2 text-xs font-semibold rounded-xl border transition-all duration-200 flex items-center gap-2 ${
+              className={`px-3 sm:px-4 py-2 text-xs font-semibold rounded-xl border transition-all duration-200 flex items-center gap-2 touch-manipulation ${
                 showArchivadasPanel
                   ? 'bg-gray-900 text-white border-gray-900 shadow-md'
                   : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-50'
@@ -341,7 +341,7 @@ export const ListaNotasRapidas = () => {
             </button>
             <Link
               to="/"
-              className="px-5 py-2.5 text-sm font-bold text-white bg-black rounded-xl hover:bg-gray-900 hover:shadow-lg transition-all duration-200 flex items-center gap-2 shadow-md"
+              className="px-4 sm:px-5 py-2.5 text-sm font-bold text-white bg-black rounded-xl hover:bg-gray-900 hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md touch-manipulation"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
@@ -474,9 +474,9 @@ export const ListaNotasRapidas = () => {
       {/* Layout 2 Columnas / Responsive */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden bg-gray-50/60">
         {/* Sidebar de Notas */}
-        <div className="w-full lg:w-96 flex-shrink-0 border-r border-gray-100 bg-gray-50 flex flex-col overflow-hidden">
+        <div className="w-full lg:w-96 flex-shrink-0 border-b lg:border-b-0 lg:border-r border-gray-100 bg-gray-50 flex flex-col overflow-hidden">
           {/* Lista de Notas */}
-          <div className="flex-1 overflow-y-auto space-y-2 scrollbar-hide pt-4">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-2 scrollbar-hide pt-4 px-2 sm:px-4">
             {notas.length === 0 ? (
               <div className="text-center py-16">
                 <div className="w-16 h-16 mx-auto mb-4 bg-gray-200 rounded-2xl flex items-center justify-center">
@@ -493,10 +493,10 @@ export const ListaNotasRapidas = () => {
                 const color = nota.colorHex;
 
                 return (
-                  <div key={nota.id} className="px-4 py-1">
+                  <div key={nota.id} className="px-2 sm:px-4 py-1">
                     <div
                       onClick={() => handleAbrirNota(nota)}
-                      className={`group relative cursor-pointer transition-transform duration-200`}
+                      className={`group relative cursor-pointer transition-transform duration-200 touch-manipulation active:scale-[0.98]`}
                     >
                       {/* Tarjeta tipo nota adhesiva */}
                       <div
@@ -577,15 +577,15 @@ export const ListaNotasRapidas = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-gray-700 mb-2" style={{ fontFamily: "'Inter', sans-serif" }}>
+                <h3 className="text-lg sm:text-xl font-bold text-gray-700 mb-2" style={{ fontFamily: "'Inter', sans-serif" }}>
                   Selecciona una nota
                 </h3>
-                <p className="text-gray-500 mb-6">
+                <p className="text-sm sm:text-base text-gray-500 mb-6">
                   Elige una nota de la lista para ver y editar su contenido
                 </p>
                 <Link
                   to="/"
-                  className="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold text-white bg-black rounded-xl hover:bg-gray-900 hover:shadow-lg transition-all duration-200"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-bold text-white bg-black rounded-xl hover:bg-gray-900 hover:shadow-lg transition-all duration-200 touch-manipulation"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
@@ -596,13 +596,13 @@ export const ListaNotasRapidas = () => {
             </div>
           ) : (
             <div
-              className="flex-1 flex flex-col overflow-hidden px-3 py-2"
+              className="flex-1 flex flex-col overflow-hidden px-2 sm:px-3 py-2 sm:py-3"
               onKeyDown={handleKeyDown}
             >
               {/* Contenedor tipo documento (sin bordes externos) */}
               <div className="flex-1 flex flex-col rounded-3xl bg-white overflow-hidden">
                 {/* Header compacto */}
-                <div className="flex-shrink-0 flex items-center justify-between px-6 py-2.5 border-b border-gray-100 bg-gradient-to-r from-white to-gray-50">
+                <div className="flex-shrink-0 flex items-center justify-between px-4 sm:px-6 py-2.5 border-b border-gray-100 bg-gradient-to-r from-white to-gray-50">
                   <div className="flex items-center gap-3">
                     {colorEdit && (
                       <div
@@ -626,13 +626,13 @@ export const ListaNotasRapidas = () => {
 
                 {/* Content */}
                 <div className="flex-1 flex flex-col bg-white overflow-y-auto scrollbar-hide">
-                  <div className="flex-1 flex flex-col px-6 py-4">
+                  <div className="flex-1 flex flex-col px-4 sm:px-6 py-4">
                     <textarea
                       ref={textareaRef}
                       value={contenidoEdit}
                       onChange={(e) => setContenidoEdit(e.target.value)}
                       placeholder="Escribe tu nota aquí..."
-                      className="w-full flex-1 min-h-[calc(100vh-280px)] border-none outline-none resize-none text-gray-900 placeholder-gray-400 text-base lg:text-lg leading-relaxed lg:leading-[1.95] bg-transparent focus:outline-none"
+                      className="w-full flex-1 min-h-[200px] sm:min-h-[calc(100vh-280px)] border-none outline-none resize-none text-gray-900 placeholder-gray-400 text-[15px] sm:text-base lg:text-lg leading-relaxed lg:leading-[1.95] bg-transparent focus:outline-none"
                       style={{
                         fontFamily: "'Inter', sans-serif",
                       }}
@@ -642,10 +642,10 @@ export const ListaNotasRapidas = () => {
               </div>
 
               {/* Footer unificado: color + acciones */}
-              <div className="flex-shrink-0 mt-2 px-4 py-2.5 bg-white border border-gray-100 rounded-2xl shadow-sm space-y-2">
+              <div className="flex-shrink-0 mt-2 px-3 sm:px-4 py-2.5 bg-white border border-gray-100 rounded-2xl shadow-sm space-y-2">
                 {/* Colores + atajos */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-1.5">
                     {COLORES.map((color) => (
                       <button
                         key={color.hex || 'none'}
@@ -668,7 +668,7 @@ export const ListaNotasRapidas = () => {
                       </button>
                     ))}
                   </div>
-                  <div className="flex items-center gap-2 text-[10px] text-gray-400">
+                  <div className="hidden sm:flex items-center gap-2 text-[10px] text-gray-400">
                     <kbd className="px-1.5 py-0.5 bg-gray-50 rounded border border-gray-200 font-mono">Ctrl+Enter</kbd>
                     <span>guardar</span>
                     <kbd className="px-1.5 py-0.5 bg-gray-50 rounded border border-gray-200 font-mono">Esc</kbd>
@@ -678,11 +678,11 @@ export const ListaNotasRapidas = () => {
 
                 {/* Botones de acción */}
                 {!showDeleteConfirm ? (
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
                       onClick={handleGuardar}
                       disabled={isSaving || isDeleting || !contenidoEdit.trim()}
-                      className="flex-1 px-4 py-2.5 text-sm font-bold text-white bg-black rounded-xl hover:bg-gray-900 hover:shadow-xl transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg"
+                      className="flex-1 min-w-0 px-4 py-2.5 text-sm font-bold text-white bg-black rounded-xl hover:bg-gray-900 hover:shadow-xl transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg touch-manipulation"
                     >
                       {isSaving ? (
                         <>
@@ -704,7 +704,7 @@ export const ListaNotasRapidas = () => {
                     <button
                       onClick={handleArchivar}
                       disabled={isSaving || isDeleting}
-                      className="px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5"
+                      className="px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 touch-manipulation"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
@@ -714,7 +714,7 @@ export const ListaNotasRapidas = () => {
                     <button
                       onClick={() => setShowDeleteConfirm(true)}
                       disabled={isSaving || isDeleting}
-                      className="px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5"
+                      className="px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-1.5 touch-manipulation"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

@@ -179,7 +179,7 @@ export const TareasPage = () => {
   if (isLoading) {
     return (
       <Layout>
-        <div className="w-full h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50/60">
+        <div className="w-full min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50/60">
           <div className="text-center">
             <div className="w-12 h-12 mx-auto mb-4 border-3 border-gray-200 border-t-black rounded-full animate-spin" />
             <p className="text-sm text-gray-500">Cargando tareas...</p>
@@ -204,12 +204,12 @@ export const TareasPage = () => {
             : `${pri.border} bg-white hover:shadow-md`
         }`}
       >
-        <div className="flex items-start gap-3 px-4 py-3">
+        <div className="flex items-start gap-3 px-3 sm:px-4 py-3">
           {/* Checkbox */}
           <button
             onClick={() => handleAlternar(t.id)}
             disabled={tareaAlternandoId === t.id}
-            className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-200 ${
+            className={`mt-0.5 flex-shrink-0 w-6 h-6 sm:w-5 sm:h-5 rounded-md border-2 flex items-center justify-center transition-all duration-200 touch-manipulation ${
               t.estaCompletada
                 ? 'bg-green-500 border-green-500'
                 : `border-gray-300 hover:border-gray-500 ${pri.ring} hover:ring-2`
@@ -263,14 +263,14 @@ export const TareasPage = () => {
                   <div className="flex gap-1.5 ml-auto">
                     <button
                       onClick={() => setTareaEditando(null)}
-                      className="px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors touch-manipulation"
                     >
                       Cancelar
                     </button>
                     <button
                       onClick={handleGuardarEdicion}
                       disabled={isGuardando || !editDescripcion.trim()}
-                      className="px-3 py-1.5 bg-black text-white rounded-lg text-xs font-semibold disabled:opacity-40 hover:bg-gray-800 transition-colors"
+                      className="px-3 py-1.5 bg-black text-white rounded-lg text-xs font-semibold disabled:opacity-40 hover:bg-gray-800 transition-colors touch-manipulation"
                     >
                       {isGuardando ? 'Guardando...' : 'Guardar'}
                     </button>
@@ -280,7 +280,7 @@ export const TareasPage = () => {
             ) : (
               <div
                 onClick={() => !t.estaCompletada && handleAbrirEditar(t)}
-                className={!t.estaCompletada ? 'cursor-pointer' : ''}
+                className={!t.estaCompletada ? 'cursor-pointer touch-manipulation' : ''}
               >
                 <p className={`text-sm leading-relaxed ${
                   t.estaCompletada
@@ -319,13 +319,13 @@ export const TareasPage = () => {
             )}
           </div>
 
-          {/* Acciones */}
+          {/* Acciones: siempre visibles en móvil (no hay hover), hover en desktop */}
           {!isEditing && (
-            <div className="flex items-center gap-0.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+            <div className="flex items-center gap-0.5 flex-shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-150">
               {!t.estaCompletada && (
                 <button
                   onClick={() => handleAbrirEditar(t)}
-                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors touch-manipulation"
                   title="Editar"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -338,13 +338,13 @@ export const TareasPage = () => {
                   <button
                     onClick={() => handleEliminar(t.id)}
                     disabled={tareaEliminandoId === t.id}
-                    className="px-2 py-1 text-[11px] font-bold text-white bg-red-600 rounded-md hover:bg-red-700 disabled:opacity-50"
+                    className="px-2 py-1 text-[11px] font-bold text-white bg-red-600 rounded-md hover:bg-red-700 disabled:opacity-50 touch-manipulation"
                   >
                     {tareaEliminandoId === t.id ? '...' : 'Eliminar'}
                   </button>
                   <button
                     onClick={() => setShowDeleteConfirm(null)}
-                    className="px-2 py-1 text-[11px] font-medium text-gray-600 hover:text-gray-800"
+                    className="px-2 py-1 text-[11px] font-medium text-gray-600 hover:text-gray-800 touch-manipulation"
                   >
                     No
                   </button>
@@ -352,7 +352,7 @@ export const TareasPage = () => {
               ) : (
                 <button
                   onClick={() => setShowDeleteConfirm(t.id)}
-                  className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors touch-manipulation"
                   title="Eliminar"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -369,13 +369,13 @@ export const TareasPage = () => {
 
   return (
     <Layout>
-      <div className="w-full h-[calc(100vh-4rem)] flex flex-col overflow-hidden bg-gray-50/60">
+      <div className="w-full min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex flex-col overflow-hidden bg-gray-50/60">
         {/* Header con estadisticas */}
-        <div className="flex-shrink-0 bg-white border-b border-gray-200 px-6 lg:px-8 py-4">
+        <div className="flex-shrink-0 bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="max-w-4xl mx-auto">
-            <div className="flex items-center justify-between gap-4 mb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-bold text-black" style={{ fontFamily: "'Inter', sans-serif", letterSpacing: '-0.03em' }}>
+                <h1 className="text-xl sm:text-2xl font-bold text-black" style={{ fontFamily: "'Inter', sans-serif", letterSpacing: '-0.03em' }}>
                   Tareas
                 </h1>
                 {total > 0 && (
@@ -386,7 +386,7 @@ export const TareasPage = () => {
               </div>
               <button
                 onClick={() => { setShowCrear(!showCrear); setVista('pendientes'); }}
-                className="px-4 py-2 bg-black text-white rounded-xl font-semibold text-sm hover:bg-gray-800 transition-all flex items-center gap-2 shadow-sm hover:shadow-md"
+                className="w-full sm:w-auto px-4 py-2.5 sm:py-2 bg-black text-white rounded-xl font-semibold text-sm hover:bg-gray-800 transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md touch-manipulation"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
@@ -409,11 +409,11 @@ export const TareasPage = () => {
             )}
 
             {/* Tabs + stats compactos */}
-            <div className="flex items-center gap-4 mt-3">
-              <div className="flex rounded-xl bg-gray-100 p-0.5">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mt-3">
+              <div className="flex rounded-xl bg-gray-100 p-0.5 w-full sm:w-auto">
                 <button
                   onClick={() => setVista('pendientes')}
-                  className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
+                  className={`flex-1 sm:flex-initial px-3 sm:px-4 py-2 sm:py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 touch-manipulation ${
                     vista === 'pendientes'
                       ? 'bg-white text-black shadow-sm'
                       : 'text-gray-500 hover:text-gray-700'
@@ -430,7 +430,7 @@ export const TareasPage = () => {
                 </button>
                 <button
                   onClick={() => setVista('completadas')}
-                  className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
+                  className={`flex-1 sm:flex-initial px-3 sm:px-4 py-2 sm:py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 touch-manipulation ${
                     vista === 'completadas'
                       ? 'bg-white text-black shadow-sm'
                       : 'text-gray-500 hover:text-gray-700'
@@ -475,11 +475,11 @@ export const TareasPage = () => {
         </div>
 
         {/* Contenido */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="max-w-4xl mx-auto px-6 lg:px-8 py-4">
+        <div className="flex-1 overflow-y-auto pb-safe">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             {/* Formulario nueva tarea */}
             {showCrear && vista === 'pendientes' && (
-              <div className="mb-4 bg-white rounded-xl border border-gray-200 shadow-sm p-4 space-y-3">
+              <div className="mb-4 bg-white rounded-xl border border-gray-200 shadow-sm p-3 sm:p-4 space-y-3">
                 <input
                   ref={inputRef}
                   type="text"
@@ -489,14 +489,14 @@ export const TareasPage = () => {
                   placeholder="Describe la tarea..."
                   className="w-full px-0 py-1 text-sm font-medium border-none focus:outline-none placeholder:text-gray-400 bg-transparent"
                 />
-                <div className="flex items-center justify-between gap-3 flex-wrap">
-                  <div className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-2">
                     {PRIORIDADES.map((p) => (
                       <button
                         key={p.valor}
                         type="button"
                         onClick={() => setNuevaPrioridad(p.valor)}
-                        className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
+                        className={`px-2.5 py-1.5 sm:py-1 text-xs font-semibold rounded-lg border transition-all touch-manipulation ${
                           nuevaPrioridad === p.valor
                             ? `${p.bg} ${p.color} ${p.border} ring-1 ${p.ring}`
                             : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
@@ -519,17 +519,17 @@ export const TareasPage = () => {
                       />
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     <button
                       onClick={() => { setShowCrear(false); setNuevaDescripcion(''); }}
-                      className="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors touch-manipulation"
                     >
                       Cancelar
                     </button>
                     <button
                       onClick={handleCrear}
                       disabled={!nuevaDescripcion.trim() || isCreando}
-                      className="px-4 py-1.5 bg-black text-white rounded-lg font-semibold text-xs hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center gap-1.5"
+                      className="px-4 py-1.5 bg-black text-white rounded-lg font-semibold text-xs hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center gap-1.5 touch-manipulation"
                     >
                       {isCreando ? (
                         <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">

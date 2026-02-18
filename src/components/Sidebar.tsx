@@ -94,6 +94,19 @@ export const Sidebar = ({ isCollapsed, onToggle }: SidebarProps) => {
           </Link>
 
           <Link
+            to="/transcripcion-reunion"
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-100 transition-all duration-200 ${
+              isCollapsed ? 'justify-center' : ''
+            } ${location.pathname === '/transcripcion-reunion' ? 'bg-gray-100' : ''}`}
+            title="Transcripción de reuniones"
+          >
+            <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v7m0-9a7 7 0 0114 0z" />
+            </svg>
+            {!isCollapsed && <span className="text-sm font-medium text-gray-700">Transcripción reunión</span>}
+          </Link>
+
+          <Link
             to="/carpetas"
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-100 transition-all duration-200 ${
               isCollapsed ? 'justify-center' : ''
@@ -140,10 +153,10 @@ export const Sidebar = ({ isCollapsed, onToggle }: SidebarProps) => {
         </nav>
       </aside>
 
-      {/* Floating Toggle Button */}
+      {/* Floating Toggle Button - solo desktop */}
       <button
         onClick={onToggle}
-        className={`fixed top-20 z-50 bg-white border border-gray-200 rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-300 hover:bg-gray-50 ${
+        className={`hidden lg:flex fixed top-20 z-50 bg-white border border-gray-200 rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-300 hover:bg-gray-50 items-center justify-center ${
           isCollapsed ? 'left-16' : 'left-[15.5rem]'
         }`}
         aria-label={isCollapsed ? 'Expandir sidebar' : 'Colapsar sidebar'}

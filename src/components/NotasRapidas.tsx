@@ -140,11 +140,11 @@ export const NotasRapidas = () => {
   };
 
   return (
-    <div className="w-full h-full flex items-center justify-center pt-10">
+    <div className="w-full min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex items-center justify-center pt-6 sm:pt-10 pb-safe px-4 sm:px-6">
       <div className="w-full max-w-5xl">
         {/* Título principal */}
-        <div ref={titleRef} className="mb-10">
-          <h1 className="text-6xl font-light text-black tracking-tight" style={{ fontFamily: "'Inter', sans-serif", letterSpacing: '-0.03em' }}>
+        <div ref={titleRef} className="mb-6 sm:mb-10">
+          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-light text-black tracking-tight" style={{ fontFamily: "'Inter', sans-serif", letterSpacing: '-0.03em' }}>
             Notas Rápidas
           </h1>
         </div>
@@ -152,17 +152,17 @@ export const NotasRapidas = () => {
         {/* Tarjeta del editor */}
         <div
           ref={containerRef}
-          className={`relative bg-white border-2 rounded-3xl transition-all duration-300 ${
+          className={`relative bg-white border-2 rounded-2xl sm:rounded-3xl transition-all duration-300 ${
             isFocused
               ? 'border-black shadow-[0_20px_50px_rgba(0,0,0,0.15)]'
               : 'border-gray-200 hover:border-gray-300 shadow-[0_10px_30px_rgba(0,0,0,0.08)]'
           }`}
         >
-          <div className="p-10">
+          <div className="p-4 sm:p-6 lg:p-10">
             {/* Header del editor */}
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 sm:mb-6 pb-4 border-b border-gray-200">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-gray-100 rounded-lg">
+                <div className="p-2 bg-gray-100 rounded-lg flex-shrink-0">
                   <svg
                     className="w-5 h-5 text-black"
                     fill="none"
@@ -177,7 +177,7 @@ export const NotasRapidas = () => {
                     />
                   </svg>
                 </div>
-                <h2 className="text-xl font-semibold text-black" style={{ fontFamily: "'Inter', sans-serif" }}>
+                <h2 className="text-lg sm:text-xl font-semibold text-black" style={{ fontFamily: "'Inter', sans-serif" }}>
                   Nueva Nota
                 </h2>
               </div>
@@ -200,7 +200,7 @@ export const NotasRapidas = () => {
                 }}
                 onKeyDown={handleKeyDown}
                 placeholder="Comienza a escribir tu nota..."
-                className="w-full min-h-[340px] p-0 border-none outline-none resize-none text-black placeholder-gray-400 bg-transparent text-lg leading-relaxed focus:outline-none"
+                className="w-full min-h-[200px] sm:min-h-[280px] lg:min-h-[340px] p-0 border-none outline-none resize-none text-black placeholder-gray-400 bg-transparent text-base sm:text-lg leading-relaxed focus:outline-none"
                 style={{
                   fontFamily: "'Inter', sans-serif",
                   fontSize: '1.125rem',
@@ -210,9 +210,9 @@ export const NotasRapidas = () => {
             </div>
 
             {/* Footer con atajos y botones */}
-            <div className="flex items-center justify-between pt-6 border-t-2 border-gray-100">
-              {/* Atajos de teclado */}
-              <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 sm:pt-6 border-t-2 border-gray-100">
+              {/* Atajos de teclado - ocultos en móvil */}
+              <div className="hidden sm:flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-1">
                     <kbd className="px-3 py-1.5 bg-gray-100 text-gray-700 border border-gray-300 rounded-lg text-xs font-semibold shadow-sm">
@@ -235,10 +235,10 @@ export const NotasRapidas = () => {
               </div>
 
               {/* Botones de acción */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
                 <button
                   onClick={limpiarCaja}
-                  className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 border border-gray-200"
+                  className="flex-1 sm:flex-initial px-4 sm:px-6 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 border border-gray-200 touch-manipulation"
                   disabled={isSaving}
                 >
                   Cancelar
@@ -246,7 +246,7 @@ export const NotasRapidas = () => {
                 <button
                   onClick={handleSave}
                   disabled={isSaving || !contenido.trim()}
-                  className="px-8 py-2.5 text-sm font-semibold text-white bg-black hover:bg-gray-800 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2"
+                  className="flex-1 sm:flex-initial w-full sm:w-auto px-4 sm:px-8 py-2.5 text-sm font-semibold text-white bg-black hover:bg-gray-800 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl shadow-lg hover:shadow-xl flex items-center justify-center gap-2 touch-manipulation"
                 >
                   {isSaving ? (
                     <>
@@ -287,7 +287,8 @@ export const NotasRapidas = () => {
                           d="M5 13l4 4L19 7"
                         />
                       </svg>
-                      Guardar Nota
+                      <span className="sm:hidden">Guardar</span>
+                      <span className="hidden sm:inline">Guardar Nota</span>
                     </>
                   )}
                 </button>
@@ -296,9 +297,9 @@ export const NotasRapidas = () => {
           </div>
         </div>
 
-        {/* Indicador de ayuda */}
+        {/* Indicador de ayuda - oculto en móvil */}
         {!contenido && !isFocused && (
-          <div className="mt-6 flex items-center gap-2 text-sm text-gray-400">
+          <div className="hidden sm:flex mt-6 items-center gap-2 text-sm text-gray-400">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
             </svg>

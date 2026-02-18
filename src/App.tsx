@@ -8,6 +8,7 @@ import { NotasPage } from './components/NotasPage';
 import { CarpetasPage } from './components/CarpetasPage';
 import { TareasPage } from './components/TareasPage';
 import { DashboardPage } from './components/DashboardPage';
+import { MeetingTranscriberPage } from './components/MeetingTranscriberPage';
 import { LandingPage } from './components/LandingPage';
 
 function App() {
@@ -46,6 +47,7 @@ function App() {
             <Route path="/notas" element={<NotasPage />} />
             <Route path="/carpetas" element={<CarpetasPage />} />
             <Route path="/tareas" element={<TareasPage />} />
+            <Route path="/transcripcion-reunion" element={<MeetingTranscriberPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </>
         )}

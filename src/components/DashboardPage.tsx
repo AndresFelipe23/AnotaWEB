@@ -32,7 +32,7 @@ const FolderCard = ({
   <button
     type="button"
     onClick={onClick}
-    className="group relative text-left w-full transition-transform duration-200 hover:-translate-y-1"
+    className="group relative text-left w-full transition-transform duration-200 hover:-translate-y-1 touch-manipulation active:scale-[0.98]"
   >
     {/* Tab de la carpeta */}
     <div
@@ -188,16 +188,16 @@ export const DashboardPage = () => {
 
   return (
     <Layout>
-      <div className="w-full h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
+      <div className="w-full min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
         {/* ─── Header ─── */}
-        <div className="flex-shrink-0 bg-white border-b border-gray-100 px-6 py-4">
-          <div className="flex items-end justify-between gap-4">
+        <div className="flex-shrink-0 bg-white border-b border-gray-100 px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
             <div>
               <p className="text-xs text-gray-400 font-medium uppercase tracking-widest mb-1">
                 {saludo}
               </p>
               <h1
-                className="text-2xl font-bold text-gray-900"
+                className="text-xl sm:text-2xl font-bold text-gray-900"
                 style={{ fontFamily: "'Inter', sans-serif", letterSpacing: '-0.03em' }}
               >
                 Resumen general
@@ -205,7 +205,7 @@ export const DashboardPage = () => {
             </div>
 
             {/* Stats compactos */}
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {[
                 { value: notas.length, label: 'Notas', bg: 'bg-blue-50', text: 'text-blue-600', border: 'border-blue-100' },
                 { value: notasRapidas.length, label: 'Rápidas', bg: 'bg-amber-50', text: 'text-amber-600', border: 'border-amber-100' },
@@ -213,7 +213,7 @@ export const DashboardPage = () => {
               ].map((s) => (
                 <div
                   key={s.label}
-                  className={`${s.bg} ${s.border} border rounded-xl px-3 py-1.5 flex items-center gap-1.5`}
+                  className={`${s.bg} ${s.border} border rounded-xl px-2.5 sm:px-3 py-1 sm:py-1.5 flex items-center gap-1.5`}
                 >
                   <span className={`text-base font-bold ${s.text}`}>{s.value}</span>
                   <span className="text-[11px] text-gray-500">{s.label}</span>
@@ -224,10 +224,10 @@ export const DashboardPage = () => {
         </div>
 
         {/* ─── Contenido scrollable ─── */}
-        <div className="flex-1 overflow-y-auto bg-gray-50/50 px-6 pb-8">
+        <div className="flex-1 overflow-y-auto bg-gray-50/50 px-4 sm:px-6 pb-8 pb-safe">
           {/* ═══ Carpetas ═══ */}
-          <section className="mt-5 mb-6">
-            <div className="flex items-center justify-between mb-4">
+          <section className="mt-4 sm:mt-5 mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
               <div className="flex items-center gap-2">
                 <h2 className="text-sm font-bold text-gray-900">Carpetas</h2>
                 <span className="text-[11px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
@@ -237,14 +237,14 @@ export const DashboardPage = () => {
               <button
                 type="button"
                 onClick={() => navigate('/notas')}
-                className="text-xs text-gray-500 hover:text-gray-900 transition-colors"
+                className="text-xs text-gray-500 hover:text-gray-900 transition-colors touch-manipulation text-left sm:text-right"
               >
                 Gestionar carpetas →
               </button>
             </div>
 
             {isLoading ? (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                 {[1, 2, 3, 4].map((i) => (
                   <div key={i} className="space-y-0">
                     <div className="h-[14px] w-20 ml-[2px] rounded-t-lg bg-gray-200 animate-pulse" />
@@ -263,7 +263,7 @@ export const DashboardPage = () => {
                 <p className="text-xs text-gray-400 mt-1">Crea una carpeta desde la vista de notas.</p>
               </div>
             ) : (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                 {carpetas.map((c, i) => {
                   const notasEnCarpeta = notasPorCarpeta.get(c.id) || [];
                   return (
@@ -293,7 +293,7 @@ export const DashboardPage = () => {
 
           {/* ═══ Notas rápidas ═══ */}
           <section className="mb-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
               <div className="flex items-center gap-2">
                 <h2 className="text-sm font-bold text-gray-900">Notas rápidas</h2>
                 <span className="text-[10px] font-semibold text-amber-600 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full">
@@ -303,7 +303,7 @@ export const DashboardPage = () => {
               <button
                 type="button"
                 onClick={() => navigate('/notas-rapidas')}
-                className="text-xs text-gray-500 hover:text-gray-900 transition-colors"
+                className="text-xs text-gray-500 hover:text-gray-900 transition-colors touch-manipulation text-left sm:text-right"
               >
                 Ver todas →
               </button>
@@ -319,7 +319,7 @@ export const DashboardPage = () => {
                 <p className="text-sm text-gray-500">Aún no tienes notas rápidas.</p>
               </div>
             ) : (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {notasRapidas.slice(0, 6).map((n, i) => {
                   const noteColors = ['#f59e0b', '#8b5cf6', '#3b82f6', '#10b981', '#ec4899', '#06b6d4'];
                   const color = (n as any).colorHex || noteColors[i % noteColors.length];
@@ -362,7 +362,7 @@ export const DashboardPage = () => {
 
           {/* ═══ Notas recientes ═══ */}
           <section className="mb-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
               <div className="flex items-center gap-2">
                 <h2 className="text-sm font-bold text-gray-900">Notas recientes</h2>
                 <span className="text-[10px] font-semibold text-blue-600 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full">
@@ -372,7 +372,7 @@ export const DashboardPage = () => {
               <button
                 type="button"
                 onClick={() => navigate('/notas')}
-                className="text-xs text-gray-500 hover:text-gray-900 transition-colors"
+                className="text-xs text-gray-500 hover:text-gray-900 transition-colors touch-manipulation text-left sm:text-right"
               >
                 Ver todas →
               </button>
@@ -388,7 +388,7 @@ export const DashboardPage = () => {
                 <p className="text-sm text-gray-500">Aún no tienes notas.</p>
               </div>
             ) : (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {notas.slice(0, 8).map((n) => {
                   const fecha = new Date(n.fechaActualizacion);
                   const hoy = new Date();
@@ -407,7 +407,7 @@ export const DashboardPage = () => {
                       key={n.id}
                       type="button"
                       onClick={() => handleOpenNota(n.id)}
-                      className="group text-left bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden flex flex-col"
+                      className="group text-left bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden flex flex-col touch-manipulation active:scale-[0.98]"
                     >
                       {/* Header con icono */}
                       <div className="px-4 pt-4 pb-2 flex items-start justify-between gap-2">
@@ -456,7 +456,7 @@ export const DashboardPage = () => {
 
           {/* ═══ Tareas ═══ */}
           <section className="mb-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
               <div className="flex items-center gap-2">
                 <h2 className="text-sm font-bold text-gray-900">Tareas</h2>
                 {totalTareas > 0 && (
@@ -468,13 +468,13 @@ export const DashboardPage = () => {
               <button
                 type="button"
                 onClick={() => navigate('/tareas')}
-                className="text-xs text-gray-500 hover:text-gray-900 transition-colors"
+                className="text-xs text-gray-500 hover:text-gray-900 transition-colors touch-manipulation text-left sm:text-right"
               >
                 Ir a tareas →
               </button>
             </div>
 
-            <div className="grid md:grid-cols-12 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
               {/* Indicador circular de progreso + stats */}
               <div className="md:col-span-4 bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col items-center justify-center">
                 {/* Anillo de progreso SVG */}
@@ -606,7 +606,7 @@ export const DashboardPage = () => {
                   <button
                     type="button"
                     onClick={() => navigate('/tareas')}
-                    className="mt-3 self-start text-[11px] font-semibold text-white bg-white/10 hover:bg-white/20 px-3.5 py-2 rounded-xl transition-colors flex items-center gap-1.5"
+                    className="mt-3 self-start text-[11px] font-semibold text-white bg-white/10 hover:bg-white/20 px-3.5 py-2 rounded-xl transition-colors flex items-center gap-1.5 touch-manipulation"
                   >
                     Ir a tareas
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -623,7 +623,7 @@ export const DashboardPage = () => {
         {showModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={closeModal} />
-            <div className="relative bg-white rounded-2xl shadow-2xl border border-gray-200 w-full max-w-xl max-h-[80vh] flex flex-col animate-slideInRight">
+            <div className="relative bg-white rounded-2xl shadow-2xl border border-gray-200 w-full max-w-xl max-h-[85vh] sm:max-h-[80vh] flex flex-col animate-slideInRight mx-4 sm:mx-0">
               <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
                 <div>
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">
@@ -636,7 +636,7 @@ export const DashboardPage = () => {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="p-2 rounded-xl hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="p-2 rounded-xl hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors touch-manipulation"
                   aria-label="Cerrar"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -663,7 +663,7 @@ export const DashboardPage = () => {
                       key={n.id}
                       type="button"
                       onClick={() => handleOpenNota(n.id)}
-                      className="w-full text-left px-5 py-3.5 hover:bg-gray-50/60 transition-colors flex items-center gap-3"
+                      className="w-full text-left px-5 py-3.5 hover:bg-gray-50/60 transition-colors flex items-center gap-3 touch-manipulation"
                     >
                       <span className="text-base flex-shrink-0">{n.icono || '📝'}</span>
                       <div className="flex-1 min-w-0">
@@ -686,7 +686,7 @@ export const DashboardPage = () => {
         )}
       </div>
       {/* ─── FAB global ─── */}
-      <div className="fixed bottom-6 right-6 z-[60]">
+      <div className="fixed bottom-6 right-4 sm:right-6 z-[60] pb-safe">
         {/* Backdrop */}
         {isFabOpen && (
           <div
@@ -731,6 +731,17 @@ export const DashboardPage = () => {
               route: '/tareas',
               delay: '0ms',
             },
+            {
+              label: 'Nueva transcripción',
+              icon: (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v7m0-9a7 7 0 0114 0z" />
+                </svg>
+              ),
+              iconBg: 'bg-violet-500',
+              route: '/transcripcion-reunion',
+              delay: '225ms',
+            },
           ].map((item, i) => (
             <div
               key={item.label}
@@ -756,7 +767,7 @@ export const DashboardPage = () => {
                   setIsFabOpen(false);
                   navigate(item.route);
                 }}
-                className={`${item.iconBg} w-11 h-11 rounded-full text-white shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95`}
+                className={`${item.iconBg} w-11 h-11 rounded-full text-white shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 touch-manipulation`}
               >
                 {item.icon}
               </button>
@@ -767,7 +778,7 @@ export const DashboardPage = () => {
           <button
             type="button"
             onClick={() => setIsFabOpen((prev) => !prev)}
-            className={`relative inline-flex items-center justify-center w-14 h-14 rounded-full shadow-xl transition-all duration-300 focus:outline-none ${
+            className={`relative inline-flex items-center justify-center w-14 h-14 rounded-full shadow-xl transition-all duration-300 focus:outline-none touch-manipulation ${
               isFabOpen
                 ? 'bg-gray-900 rotate-45 shadow-2xl'
                 : 'bg-black hover:shadow-2xl hover:scale-105'

@@ -95,10 +95,10 @@ export const CarpetasPage = () => {
 
   return (
     <Layout>
-      <div className="w-full max-w-3xl mx-auto px-6 py-8">
-        <div className="flex items-center justify-between mb-2">
+      <div className="w-full min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] max-w-3xl mx-auto px-4 sm:px-6 py-4 sm:py-8 pb-safe">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-2">
           <h1
-            className="text-3xl font-semibold text-black"
+            className="text-xl sm:text-2xl lg:text-3xl font-semibold text-black"
             style={{ fontFamily: "'Inter', sans-serif", letterSpacing: '-0.02em' }}
           >
             Carpetas
@@ -106,7 +106,7 @@ export const CarpetasPage = () => {
           <button
             type="button"
             onClick={abrirFormRaiz}
-            className="px-5 py-2.5 text-sm font-bold text-white bg-black rounded-xl hover:bg-gray-900 shadow-md transition-all duration-200 flex items-center gap-2"
+            className="w-full sm:w-auto px-4 sm:px-5 py-2.5 text-sm font-bold text-white bg-black rounded-xl hover:bg-gray-900 shadow-md transition-all duration-200 flex items-center justify-center gap-2 touch-manipulation"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
@@ -115,39 +115,41 @@ export const CarpetasPage = () => {
           </button>
         </div>
 
-        <p className="mb-8 text-sm text-gray-500">
+        <p className="mb-6 sm:mb-8 text-sm text-gray-500">
           Organiza tus notas en un árbol de carpetas. Crea carpetas raíz y subcarpetas anidadas para reflejar
           tus proyectos, áreas o clientes.
         </p>
 
         {showForm && (
-          <form onSubmit={handleCrear} className="mb-8 p-6 bg-white border border-gray-200 rounded-2xl shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          <form onSubmit={handleCrear} className="mb-6 sm:mb-8 p-4 sm:p-6 bg-white border border-gray-200 rounded-2xl shadow-sm">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">
               {carpetaPadreId ? `Nueva subcarpeta en "${nombrePadre}"` : 'Nueva carpeta'}
             </h3>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <input
                 type="text"
                 value={nombreNueva}
                 onChange={(e) => setNombreNueva(e.target.value)}
                 placeholder="Nombre de la carpeta"
-                className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/70"
+                className="flex-1 min-w-0 px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/70"
                 autoFocus
               />
-              <button
-                type="submit"
-                disabled={isSaving || !nombreNueva.trim()}
-                className="px-5 py-2.5 text-sm font-semibold text-white bg-black rounded-xl hover:bg-gray-900 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                {isSaving ? 'Creando...' : 'Crear'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowForm(false)}
-                className="px-4 py-2.5 text-sm font-semibold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200"
-              >
-                Cancelar
-              </button>
+              <div className="flex gap-2 flex-shrink-0">
+                <button
+                  type="submit"
+                  disabled={isSaving || !nombreNueva.trim()}
+                  className="flex-1 sm:flex-initial px-5 py-2.5 text-sm font-semibold text-white bg-black rounded-xl hover:bg-gray-900 disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation"
+                >
+                  {isSaving ? 'Creando...' : 'Crear'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                  className="px-4 py-2.5 text-sm font-semibold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 touch-manipulation"
+                >
+                  Cancelar
+                </button>
+              </div>
             </div>
           </form>
         )}
@@ -186,14 +188,14 @@ export const CarpetasPage = () => {
             <button
               type="button"
               onClick={abrirFormRaiz}
-              className="px-5 py-2.5 text-sm font-bold text-white bg-black rounded-xl hover:bg-gray-900"
+              className="px-5 py-2.5 text-sm font-bold text-white bg-black rounded-xl hover:bg-gray-900 touch-manipulation"
             >
               Crear primera carpeta
             </button>
           </div>
         ) : (
           <div className="bg-white border border-gray-100 rounded-2xl shadow-sm">
-            <div className="px-4 pt-4 pb-2 flex items-center justify-between">
+            <div className="px-3 sm:px-4 pt-4 pb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div className="flex items-center gap-2">
                 <span className="inline-flex items-center justify-center w-7 h-7 rounded-xl bg-gray-900 text-white text-xs font-semibold">
                   {carpetas.length}
@@ -208,11 +210,11 @@ export const CarpetasPage = () => {
                 </div>
               </div>
             </div>
-            <ul className="space-y-0.5 pb-2">
+            <ul className="space-y-0.5 pb-2 px-2 sm:px-0">
             {carpetas.map((c) => (
               <li
                 key={c.id}
-                className="group flex items-center gap-3 py-2.5 px-4 rounded-xl hover:bg-gray-50 border border-transparent hover:border-gray-100"
+                className="group flex items-center gap-3 py-2.5 px-3 sm:px-4 rounded-xl hover:bg-gray-50 border border-transparent hover:border-gray-100"
               >
                 <div
                   className="flex items-center gap-3 flex-1 min-w-0"
@@ -243,11 +245,11 @@ export const CarpetasPage = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
                   <button
                     type="button"
                     onClick={() => abrirFormSubcarpeta(c.id, c.nombre)}
-                    className="p-2 rounded-lg hover:bg-gray-200 text-gray-600 hover:text-gray-900 transition-colors"
+                    className="p-2 rounded-lg hover:bg-gray-200 text-gray-600 hover:text-gray-900 transition-colors touch-manipulation"
                     title="Nueva subcarpeta"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -258,7 +260,7 @@ export const CarpetasPage = () => {
                     type="button"
                     onClick={() => handleEliminar(c.id, c.nombre)}
                     disabled={eliminandoId === c.id}
-                    className="p-2 rounded-lg hover:bg-red-100 text-gray-500 hover:text-red-600 disabled:opacity-50 transition-colors"
+                    className="p-2 rounded-lg hover:bg-red-100 text-gray-500 hover:text-red-600 disabled:opacity-50 transition-colors touch-manipulation"
                     title="Eliminar"
                   >
                     {eliminandoId === c.id ? (

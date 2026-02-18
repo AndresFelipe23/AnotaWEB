@@ -139,12 +139,19 @@ export const NotasPage = () => {
   };
 
   const handleSeleccionarNota = (id: string) => {
+    // En móvil, colapsar el sidebar para que se vea el editor al abrir la nota
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setSidebarNotasColapsado(true);
+    }
     cargarNota(id);
   };
 
   // Abrir nota directamente si viene desde el buscador global (query param open)
   useEffect(() => {
     if (openId) {
+      if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+        setSidebarNotasColapsado(true);
+      }
       cargarNota(openId);
     }
   }, [openId]);
@@ -364,7 +371,7 @@ export const NotasPage = () => {
           }}
           role="button"
           tabIndex={0}
-          className="flex-1 flex items-center gap-2 min-w-0 text-left cursor-pointer"
+          className="flex-1 flex items-center gap-2 min-w-0 text-left cursor-pointer touch-manipulation"
         >
           <button
             type="button"
@@ -457,13 +464,13 @@ export const NotasPage = () => {
 
   return (
     <Layout>
-      <div className="w-full h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
+      <div className="w-full min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex-shrink-0 border-b border-gray-200 bg-white px-6 py-3">
-          <div className="flex items-center justify-between gap-3">
+        <div className="flex-shrink-0 border-b border-gray-200 bg-white px-4 sm:px-6 py-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center gap-3">
               <h1
-                className="text-2xl font-semibold text-black"
+                className="text-xl sm:text-2xl font-semibold text-black"
                 style={{ fontFamily: "'Inter', sans-serif", letterSpacing: '-0.02em' }}
               >
                 Notas
@@ -474,11 +481,11 @@ export const NotasPage = () => {
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-shrink-0">
               <button
                 type="button"
                 onClick={handleToggleArchivadasPanel}
-                className={`px-4 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 flex items-center gap-2 ${
+                className={`px-3 sm:px-4 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 flex items-center gap-2 touch-manipulation ${
                   showArchivadasPanel ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -490,7 +497,7 @@ export const NotasPage = () => {
               <button
                 onClick={handleNuevaNota}
                 disabled={isSaving}
-                className="px-5 py-2.5 text-sm font-bold text-white bg-black rounded-xl hover:bg-gray-900 hover:shadow-lg transition-all duration-200 flex items-center gap-2 shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto px-4 sm:px-5 py-2.5 text-sm font-bold text-white bg-black rounded-xl hover:bg-gray-900 hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation"
               >
               {isSaving ? (
                 <>
@@ -525,12 +532,12 @@ export const NotasPage = () => {
               sidebarNotasColapsado ? 'w-0 min-w-0' : 'w-full lg:w-80'
             }`}
           >
-            <div className="px-4 py-3 border-b border-gray-100 space-y-2 flex-shrink-0">
+            <div className="px-3 sm:px-4 py-3 border-b border-gray-100 space-y-2 flex-shrink-0">
               <div className="flex gap-1">
                 <button
                   type="button"
                   onClick={() => setFiltroFavoritas(false)}
-                  className={`flex-1 px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${
+                  className={`flex-1 px-3 py-2 text-xs font-semibold rounded-lg transition-colors touch-manipulation ${
                     !filtroFavoritas ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -539,7 +546,7 @@ export const NotasPage = () => {
                 <button
                   type="button"
                   onClick={() => setFiltroFavoritas(true)}
-                  className={`flex-1 px-3 py-2 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1 ${
+                  className={`flex-1 px-3 py-2 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1 touch-manipulation ${
                     filtroFavoritas ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -646,7 +653,7 @@ export const NotasPage = () => {
           <button
             type="button"
             onClick={() => setSidebarNotasColapsado(!sidebarNotasColapsado)}
-            className="shrink-0 w-8 h-12 flex items-center justify-center border-r border-gray-200 bg-white hover:bg-gray-50 text-gray-500 hover:text-gray-700 transition-colors self-center rounded-r-lg shadow-sm -ml-px z-10"
+            className="shrink-0 w-9 sm:w-8 h-12 flex items-center justify-center border-r border-gray-200 bg-white hover:bg-gray-50 text-gray-500 hover:text-gray-700 transition-colors self-center rounded-r-lg shadow-sm -ml-px z-10 touch-manipulation"
             title={sidebarNotasColapsado ? 'Mostrar lista de notas' : 'Ocultar lista de notas'}
             aria-label={sidebarNotasColapsado ? 'Expandir sidebar' : 'Colapsar sidebar'}
           >
@@ -662,15 +669,15 @@ export const NotasPage = () => {
 
           {/* Panel Archivadas (lateral derecho) */}
           {showArchivadasPanel && (
-            <aside className="w-80 border-l border-gray-200 bg-white flex flex-col shrink-0">
-              <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+            <aside className="w-72 sm:w-80 shrink-0 border-l border-gray-200 bg-white flex flex-col overflow-hidden">
+              <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
                 <h3 className="text-sm font-bold text-gray-800">Notas archivadas</h3>
-                <button
-                  type="button"
-                  onClick={() => setShowArchivadasPanel(false)}
-                  className="p-2 rounded-lg hover:bg-gray-100 text-gray-500"
-                  title="Cerrar"
-                >
+                  <button
+                    type="button"
+                    onClick={() => setShowArchivadasPanel(false)}
+                    className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 touch-manipulation"
+                    title="Cerrar"
+                  >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
@@ -732,8 +739,8 @@ export const NotasPage = () => {
           {/* Editor de nota */}
           <section className="flex-1 flex flex-col overflow-hidden">
             {!notaSeleccionada ? (
-              <div className="flex-1 flex items-center justify-center text-center px-6 text-sm text-gray-500">
-                Selecciona una nota de la lista de la izquierda o crea una nueva.
+              <div className="flex-1 flex items-center justify-center text-center px-4 sm:px-6 text-sm text-gray-500">
+                Selecciona una nota de la lista o crea una nueva.
               </div>
             ) : (
               <div className="flex-1 flex flex-col overflow-hidden min-w-0">
@@ -742,7 +749,7 @@ export const NotasPage = () => {
 
                 {/* Área de contenido con scroll - prioriza máximo espacio */}
                 <div className="flex-1 overflow-y-auto bg-white">
-                  <div className="w-full max-w-5xl mx-auto px-6 lg:px-12 py-6">
+                  <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-12 py-4 sm:py-6">
                     {/* Título, resumen e icono - compactos en la zona de contenido */}
                     <div className="mb-0">
                       <div className="flex items-start gap-3">
@@ -781,7 +788,7 @@ export const NotasPage = () => {
                               value={titulo}
                               onChange={(e) => setTitulo(e.target.value)}
                               placeholder="Título de la nota"
-                              className="flex-1 px-0 py-1 text-xl font-bold border-none focus:outline-none bg-transparent placeholder:text-gray-400"
+                              className="flex-1 px-0 py-1 text-lg sm:text-xl font-bold border-none focus:outline-none bg-transparent placeholder:text-gray-400 min-w-0"
                               style={{ fontFamily: "'Inter', sans-serif" }}
                             />
                             <button
@@ -821,8 +828,8 @@ export const NotasPage = () => {
                 </div>
 
                 {/* Footer compacto y fijo */}
-                <div className="flex-shrink-0 px-6 lg:px-12 py-2.5 border-t border-gray-100 bg-white">
-                  <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
+                <div className="flex-shrink-0 px-4 sm:px-6 lg:px-12 py-2.5 border-t border-gray-100 bg-white">
+                  <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                     <div className="flex items-center gap-3 flex-wrap">
                       {notaSeleccionada.etiquetas && notaSeleccionada.etiquetas.length > 0 && (
                         <div className="flex items-center gap-1.5 flex-wrap">
@@ -995,7 +1002,7 @@ export const NotasPage = () => {
                     <button
                       onClick={handleGuardar}
                       disabled={isSaving || !titulo.trim()}
-                      className="px-5 py-2 text-sm font-semibold text-white bg-black rounded-lg hover:bg-gray-900 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                      className="w-full sm:w-auto px-4 sm:px-5 py-2.5 sm:py-2 text-sm font-semibold text-white bg-black rounded-lg hover:bg-gray-900 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 touch-manipulation"
                     >
                       {isSaving ? (
                         <>
@@ -1039,14 +1046,14 @@ export const NotasPage = () => {
                   <button
                     type="button"
                     onClick={() => { setShowDeleteConfirm(false); setNotaAEliminarId(null); }}
-                    className="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200"
+                    className="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 touch-manipulation"
                   >
                     Cancelar
                   </button>
                   <button
                     type="button"
                     onClick={handleConfirmarEliminar}
-                    className="px-4 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700"
+                    className="px-4 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 touch-manipulation"
                   >
                     Eliminar
                   </button>

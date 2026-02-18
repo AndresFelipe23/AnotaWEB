@@ -47,6 +47,9 @@ class ApiService {
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
+        if (config.data instanceof FormData) {
+          delete config.headers['Content-Type'];
+        }
         return config;
       },
       (error) => {
@@ -249,6 +252,14 @@ class ApiService {
 
   async eliminarTarea(id: string): Promise<void> {
     await this.api.delete(`/api/tareas/${id}`);
+  }
+
+  // ============ TRANSCRIPCIÓN (Whisper) ============
+  async transcribirAudio(audioBlob: Blob): Promise<{ texto: string }> {
+    const formData = new FormData();
+    formData.append('file', audioBlob, 'capture.webm');
+    const response = await this.api.post<{ texto: string }>('/api/transcripcion/audio', formData);
+    return response.data;
   }
 }
 
