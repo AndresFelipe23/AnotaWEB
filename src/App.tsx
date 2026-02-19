@@ -10,6 +10,8 @@ import { TareasPage } from './components/TareasPage';
 import { DashboardPage } from './components/DashboardPage';
 import { MeetingTranscriberPage } from './components/MeetingTranscriberPage';
 import { LandingPage } from './components/LandingPage';
+import { PoliticaPrivacidad } from './components/PoliticaPrivacidad';
+import { CondicionesServicio } from './components/CondicionesServicio';
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -32,6 +34,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/politica-privacidad" element={<PoliticaPrivacidad />} />
+        <Route path="/condiciones-servicio" element={<CondicionesServicio />} />
         {!isAuthenticated ? (
           <>
             <Route path="/" element={<LandingPage />} />

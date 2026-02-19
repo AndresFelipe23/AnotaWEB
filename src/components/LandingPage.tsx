@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import logoSvg from '../assets/logo.svg';
 
 export const LandingPage = () => {
@@ -218,8 +219,13 @@ export const LandingPage = () => {
         </section>
       </main>
 
-      <footer className="border-t border-gray-200 py-4 text-xs text-gray-500 text-center">
-        Anota · Tu espacio para pensar y ejecutar.
+      <footer className="border-t border-gray-200 py-6 text-xs text-gray-500 text-center">
+        <p className="mb-2">Anota · Tu espacio para pensar y ejecutar.</p>
+        <p>
+          <Link to="/politica-privacidad" className="text-gray-600 hover:text-black underline">Política de Privacidad</Link>
+          {' · '}
+          <Link to="/condiciones-servicio" className="text-gray-600 hover:text-black underline">Condiciones del Servicio</Link>
+        </p>
       </footer>
     </div>
   );
