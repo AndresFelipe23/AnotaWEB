@@ -148,3 +148,20 @@ export interface ActualizarTareaRequest {
   prioridad: number;
   fechaVencimiento?: string;
 }
+
+// Google Tasks Integration
+export interface GoogleTaskList {
+  id: string;
+  title: string;
+}
+
+export interface GoogleTask {
+  id: string;
+  title: string;
+  notes?: string;
+  status: 'needsAction' | 'completed';
+  due?: string;
+  completed?: string;
+  taskListId: string;
+  taskListTitle: string;
+}

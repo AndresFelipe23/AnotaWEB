@@ -19,6 +19,8 @@ import type {
   NotaRapida,
   Tarea,
   Etiqueta,
+  GoogleTaskList,
+  GoogleTask,
 } from '../types/api';
 
 const API_URL =
@@ -248,6 +250,49 @@ class ApiService {
 
   async eliminarTarea(id: string): Promise<void> {
     await this.api.delete(`/api/tareas/${id}`);
+  }
+
+  // ============ GOOGLE TASKS ============
+  async getGoogleAuthUrl(): Promise<{ authUrl: string }> {
+    const response = await this.api.get<{ authUrl: string }>('/api/integrations/google/auth-url');
+    return response.data;
+  }
+
+  async getGoogleIntegrationStatus(): Promise<{ connected: boolean; email?: string }> {
+    const response = await this.api.get<{ connected: boolean; email?: string }>('/api/integrations/google/status');
+    return response.data;
+  }
+
+  async disconnectGoogle(): Promise<void> {
+    await this.api.delete('/api/integrations/google/disconnect');
+  }
+
+  async getGoogleTaskLists(): Promise<GoogleTaskList[]> {
+    const response = await this.api.get<GoogleTaskList[]>('/api/integrations/google/task-lists');
+    return response.data;
+  }
+
+  async getGoogleTasks(taskListId?: string): Promise<GoogleTask[]> {
+    const params = taskListId ? { taskListId } : {};
+    const response = await this.api.get<GoogleTask[]>('/api/integrations/google/tasks', { params });
+    return response.data;
+  }
+
+  async completeGoogleTask(taskListId: string, taskId: string, completada: boolean): Promise<void> {
+    await this.api.put(`/api/integrations/google/tasks/${taskListId}/${taskId}/completar`, null, {
+      params: { completada }
+    });
+  }
+
+  async updateGoogleTask(taskListId: string, taskId: string, title: string, due?: string): Promise<void> {
+    await this.api.put(`/api/integrations/google/tasks/${taskListId}/${taskId}`, {
+      title,
+      due: due || null
+    });
+  }
+
+  async deleteGoogleTask(taskListId: string, taskId: string): Promise<void> {
+    await this.api.delete(`/api/integrations/google/tasks/${taskListId}/${taskId}`);
   }
 
   // ============ TRANSCRIPCIÓN (Whisper) ============

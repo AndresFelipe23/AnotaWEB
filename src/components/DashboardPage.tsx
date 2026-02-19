@@ -326,11 +326,14 @@ export const DashboardPage = () => {
                   return (
                     <div
                       key={n.id}
-                      className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden cursor-default"
+                      className="group relative rounded-2xl border shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden cursor-default"
+                      style={{
+                        borderColor: color || '#E5E7EB',
+                        background: color
+                          ? `radial-gradient(circle at 0 0, ${color}22, transparent 55%), radial-gradient(circle at 100% 100%, ${color}11, #F9FAFB)`
+                          : undefined,
+                      }}
                     >
-                      {/* Barra superior de color */}
-                      <div className="h-1 w-full" style={{ backgroundColor: color }} />
-
                       <div className="px-4 py-3.5">
                         <p className="text-[13px] text-gray-700 line-clamp-3 leading-relaxed">
                           {n.contenido || 'Sin contenido'}
@@ -347,10 +350,12 @@ export const DashboardPage = () => {
                               minute: '2-digit',
                             })}
                           </p>
-                          <div
-                            className="w-5 h-5 rounded-full opacity-20"
-                            style={{ backgroundColor: color }}
-                          />
+                          {color && (
+                            <div
+                              className="w-5 h-5 rounded-full shadow-sm border border-white/80"
+                              style={{ backgroundColor: color }}
+                            />
+                          )}
                         </div>
                       </div>
                     </div>

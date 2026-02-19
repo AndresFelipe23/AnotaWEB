@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { apiService } from '../services/api';
@@ -16,6 +16,8 @@ export const Navbar = ({ onMenuClick, isSidebarCollapsed = false }: NavbarProps)
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [results, setResults] = useState<NotaResumen[]>([]);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleSearchChange = async (value: string) => {
     setSearch(value);
@@ -47,6 +49,23 @@ export const Navbar = ({ onMenuClick, isSidebarCollapsed = false }: NavbarProps)
     setResults([]);
     navigate(`/notas?open=${id}`);
   };
+
+  // Cerrar dropdown al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsUserDropdownOpen(false);
+      }
+    };
+
+    if (isUserDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isUserDropdownOpen]);
 
   return (
     <nav
@@ -107,32 +126,72 @@ export const Navbar = ({ onMenuClick, isSidebarCollapsed = false }: NavbarProps)
             />
           </div>
 
-          {/* User Info */}
-          <div className="hidden sm:block min-w-0">
-            <p className="text-sm font-semibold text-black truncate">
-              {usuario?.nombre} {usuario?.apellido}
-            </p>
-            <p className="text-xs text-gray-500 truncate">{usuario?.correo}</p>
-          </div>
+          {/* User Dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+              className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1.5 rounded-xl hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
+              aria-label="Menú de usuario"
+              aria-expanded={isUserDropdownOpen}
+            >
+              {/* User Info - Solo visible en pantallas medianas+ */}
+              <div className="hidden sm:block min-w-0 text-left">
+                <p className="text-sm font-semibold text-black truncate">
+                  {usuario?.nombre} {usuario?.apellido}
+                </p>
+                <p className="text-xs text-gray-500 truncate">{usuario?.correo}</p>
+              </div>
 
-          {/* User Avatar */}
-          <div className="flex-shrink-0 w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-300">
-            <span className="text-sm font-semibold text-gray-700">
-              {usuario?.nombre?.charAt(0).toUpperCase()}
-            </span>
-          </div>
+              {/* User Avatar */}
+              <div className="flex-shrink-0 w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center border-2 border-gray-300">
+                <span className="text-sm font-semibold text-gray-700">
+                  {usuario?.nombre?.charAt(0).toUpperCase()}
+                </span>
+              </div>
 
-          {/* Logout Button */}
-          <button
-            onClick={logout}
-            className="flex-shrink-0 p-2.5 rounded-xl hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
-            title="Cerrar sesión"
-            aria-label="Cerrar sesión"
-          >
-            <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-          </button>
+              {/* Dropdown Arrow */}
+              <svg
+                className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
+                  isUserDropdownOpen ? 'rotate-180' : ''
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {/* Dropdown Menu */}
+            {isUserDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                {/* User Info en el dropdown */}
+                <div className="px-4 py-3 border-b border-gray-100">
+                  <p className="text-sm font-semibold text-black truncate">
+                    {usuario?.nombre} {usuario?.apellido}
+                  </p>
+                  <p className="text-xs text-gray-500 truncate mt-0.5">{usuario?.correo}</p>
+                </div>
+
+                {/* Logout Button */}
+                <div className="px-2 pt-2">
+                  <button
+                    onClick={() => {
+                      setIsUserDropdownOpen(false);
+                      logout();
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-medium text-sm transition-colors touch-manipulation"
+                    aria-label="Cerrar sesión"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span>Cerrar sesión</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
       {/* Search modal - full screen on mobile */}

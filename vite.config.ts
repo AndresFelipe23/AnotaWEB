@@ -40,6 +40,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        navigateFallback: null, // Deshabilitar navegación fallback para permitir rutas con query params
+        navigateFallbackDenylist: [/^\/api/, /^\/_/, /^\/tareas\?google=/], // Permitir rutas de OAuth callback
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.(?:gstatic|googleapis)\.com\/.*/i,

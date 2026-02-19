@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Layout } from './Layout';
 import { apiService } from '../services/api';
-import type { Tarea, CrearTareaRequest, ActualizarTareaRequest } from '../types/api';
+import type { Tarea, CrearTareaRequest, ActualizarTareaRequest, GoogleTask } from '../types/api';
 import iziToast from 'izitoast';
 
 const PRIORIDADES = [
@@ -30,7 +31,85 @@ export const TareasPage = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Google Tasks
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [googleConnected, setGoogleConnected] = useState(false);
+  const [googleEmail, setGoogleEmail] = useState<string | null>(null);
+  const [googleTasks, setGoogleTasks] = useState<GoogleTask[]>([]);
+  const [loadingGoogle, setLoadingGoogle] = useState(false);
+  const [showGoogleTasks, setShowGoogleTasks] = useState(false);
+
   useEffect(() => { cargarTareas(); }, []);
+
+  // Manejar callback de Google OAuth
+  useEffect(() => {
+    const google = searchParams.get('google');
+    const message = searchParams.get('message');
+    if (google === 'success') {
+      iziToast.success({ title: 'Google Tasks conectado', message: 'Tu cuenta de Google Tasks está conectada.', position: 'topRight' });
+      setSearchParams({}, { replace: true });
+      cargarGoogleStatus();
+    } else if (google === 'error') {
+      iziToast.error({ title: 'Error de Google', message: message || 'No se pudo conectar con Google Tasks.', position: 'topRight' });
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams]);
+
+  const cargarGoogleStatus = async () => {
+    try {
+      const { connected, email } = await apiService.getGoogleIntegrationStatus();
+      setGoogleConnected(connected);
+      setGoogleEmail(email ?? null);
+      if (connected) cargarGoogleTasks();
+    } catch {
+      setGoogleConnected(false);
+      setGoogleEmail(null);
+    }
+  };
+
+  const cargarGoogleTasks = async () => {
+    setLoadingGoogle(true);
+    try {
+      const tasks = await apiService.getGoogleTasks();
+      setGoogleTasks(tasks);
+      if (tasks.length === 0) {
+        iziToast.info({ title: 'Google Tasks', message: 'No hay tareas en Google Tasks.', position: 'topRight', timeout: 3000 });
+      }
+    } catch (e: any) {
+      console.error('Error cargando tareas de Google:', e);
+      setGoogleTasks([]);
+      iziToast.error({ 
+        title: 'Error de Google Tasks', 
+        message: e?.response?.data?.message || e?.message || 'No se pudieron cargar las tareas de Google', 
+        position: 'topRight' 
+      });
+    } finally {
+      setLoadingGoogle(false);
+    }
+  };
+
+  useEffect(() => { cargarGoogleStatus(); }, []);
+
+  const conectarGoogle = async () => {
+    try {
+      const { authUrl } = await apiService.getGoogleAuthUrl();
+      window.location.href = authUrl;
+    } catch (e: any) {
+      iziToast.error({ title: 'Error', message: e?.response?.data?.message || 'No se pudo iniciar la conexión', position: 'topRight' });
+    }
+  };
+
+  const desconectarGoogle = async () => {
+    try {
+      await apiService.disconnectGoogle();
+      setGoogleConnected(false);
+      setGoogleEmail(null);
+      setGoogleTasks([]);
+      iziToast.success({ title: 'Desconectado', message: 'Google Tasks desconectado.', position: 'topRight' });
+    } catch (e: any) {
+      iziToast.error({ title: 'Error', message: e?.response?.data?.message || 'No se pudo desconectar', position: 'topRight' });
+    }
+  };
 
   useEffect(() => {
     if (showCrear && inputRef.current) inputRef.current.focus();
@@ -90,9 +169,39 @@ export const TareasPage = () => {
   const handleAlternar = async (id: string) => {
     if (tareaAlternandoId) return;
     setTareaAlternandoId(id);
+    
     try {
-      await apiService.alternarEstadoTarea(id);
-      await cargarTareas();
+      if (esTareaDeGoogle(id)) {
+        // Extraer taskListId y taskId del ID compuesto: google-{taskListId}-{taskId}
+        // El formato es: google-{taskListId}-{taskId}
+        // Necesitamos encontrar el primer guion después de "google-" para separar taskListId y taskId
+        const withoutPrefix = id.replace('google-', '');
+        const firstDashIndex = withoutPrefix.indexOf('-');
+        
+        if (firstDashIndex === -1) {
+          throw new Error('ID de tarea de Google inválido');
+        }
+        
+        const taskListId = withoutPrefix.substring(0, firstDashIndex);
+        const taskId = withoutPrefix.substring(firstDashIndex + 1);
+        
+        // Obtener el estado actual de la tarea
+        const tarea = googleTasks.find(t => t.id === taskId && t.taskListId === taskListId);
+        if (!tarea) {
+          throw new Error('Tarea de Google no encontrada');
+        }
+        
+        const nuevaCompletada = tarea.status !== 'completed';
+        
+        await apiService.completeGoogleTask(taskListId, taskId, nuevaCompletada);
+        
+        // Recargar tareas de Google y de Anota
+        await cargarGoogleTasks();
+        await cargarTareas();
+      } else {
+        await apiService.alternarEstadoTarea(id);
+        await cargarTareas();
+      }
       if (tareaEditando?.id === id) setTareaEditando(null);
     } catch (error: any) {
       const msg = error?.response?.data?.message || error?.message || 'No se pudo actualizar';
@@ -103,6 +212,16 @@ export const TareasPage = () => {
   };
 
   const handleAbrirEditar = (t: Tarea) => {
+    const esGoogle = esTareaDeGoogle(t.id);
+    if (esGoogle && t.estaCompletada) {
+      iziToast.info({ 
+        title: 'Tarea completada', 
+        message: 'No se pueden editar tareas completadas.', 
+        position: 'topRight',
+        timeout: 2000
+      });
+      return;
+    }
     setTareaEditando(t);
     setEditDescripcion(t.descripcion);
     setEditPrioridad(t.prioridad);
@@ -113,15 +232,36 @@ export const TareasPage = () => {
     if (!tareaEditando || !editDescripcion.trim() || isGuardando) return;
     setIsGuardando(true);
     try {
-      const data: ActualizarTareaRequest = {
-        descripcion: editDescripcion.trim(),
-        prioridad: editPrioridad,
-        fechaVencimiento: fechaVencToApi(editFechaVenc),
-      };
-      await apiService.actualizarTarea(tareaEditando.id, data);
+      const esGoogle = esTareaDeGoogle(tareaEditando.id);
+      
+      if (esGoogle) {
+        // Extraer taskListId y taskId del ID compuesto
+        const withoutPrefix = tareaEditando.id.replace('google-', '');
+        const firstDashIndex = withoutPrefix.indexOf('-');
+        if (firstDashIndex === -1) {
+          throw new Error('ID de tarea de Google inválido');
+        }
+        const taskListId = withoutPrefix.substring(0, firstDashIndex);
+        const taskId = withoutPrefix.substring(firstDashIndex + 1);
+        
+        // Actualizar tarea de Google (solo título y fecha, sin prioridad)
+        // Google Tasks espera fecha en formato YYYY-MM-DD o RFC3339
+        const fechaParaGoogle = editFechaVenc || undefined;
+        await apiService.updateGoogleTask(taskListId, taskId, editDescripcion.trim(), fechaParaGoogle);
+        await cargarGoogleTasks();
+      } else {
+        // Actualizar tarea de Anota
+        const data: ActualizarTareaRequest = {
+          descripcion: editDescripcion.trim(),
+          prioridad: editPrioridad,
+          fechaVencimiento: fechaVencToApi(editFechaVenc),
+        };
+        await apiService.actualizarTarea(tareaEditando.id, data);
+        await cargarTareas();
+      }
+      
       iziToast.success({ title: 'Guardada', message: 'Tarea actualizada', position: 'topRight' });
       setTareaEditando(null);
-      await cargarTareas();
     } catch (error: any) {
       const msg = error?.response?.data?.message || error?.message || 'No se pudo guardar';
       iziToast.error({ title: 'Error', message: msg, position: 'topRight' });
@@ -134,11 +274,28 @@ export const TareasPage = () => {
     if (tareaEliminandoId) return;
     setTareaEliminandoId(id);
     try {
-      await apiService.eliminarTarea(id);
+      const esGoogle = esTareaDeGoogle(id);
+      
+      if (esGoogle) {
+        // Extraer taskListId y taskId del ID compuesto
+        const withoutPrefix = id.replace('google-', '');
+        const firstDashIndex = withoutPrefix.indexOf('-');
+        if (firstDashIndex === -1) {
+          throw new Error('ID de tarea de Google inválido');
+        }
+        const taskListId = withoutPrefix.substring(0, firstDashIndex);
+        const taskId = withoutPrefix.substring(firstDashIndex + 1);
+        
+        await apiService.deleteGoogleTask(taskListId, taskId);
+        await cargarGoogleTasks();
+      } else {
+        await apiService.eliminarTarea(id);
+        await cargarTareas();
+      }
+      
       iziToast.success({ title: 'Eliminada', message: 'Tarea eliminada', position: 'topRight' });
       setShowDeleteConfirm(null);
       if (tareaEditando?.id === id) setTareaEditando(null);
-      await cargarTareas();
     } catch (error: any) {
       const msg = error?.response?.data?.message || error?.message || 'No se pudo eliminar';
       iziToast.error({ title: 'Error', message: msg, position: 'topRight' });
@@ -167,14 +324,46 @@ export const TareasPage = () => {
   };
 
   const prioridadInfo = (p: number) => PRIORIDADES.find((x) => x.valor === p) || PRIORIDADES[1];
-  const tareas = vista === 'pendientes' ? pendientes : completadas;
-  const total = pendientes.length + completadas.length;
-  const porcentaje = total > 0 ? Math.round((completadas.length / total) * 100) : 0;
+  
+  // Convertir tareas de Google a formato compatible con Tarea de Anota
+  const convertirGoogleTaskATarea = (gt: GoogleTask): Tarea => ({
+    id: `google-${gt.taskListId}-${gt.id}`,
+    usuarioId: '',
+    descripcion: gt.title,
+    estaCompletada: gt.status === 'completed',
+    prioridad: 2, // Prioridad media por defecto
+    orden: 0,
+    fechaVencimiento: gt.due,
+    fechaCreacion: gt.completed || new Date().toISOString(),
+    fechaCompletada: gt.completed,
+    notaVinculadaId: undefined,
+  });
 
-  // Agrupar pendientes por prioridad
-  const altaPrioridad = pendientes.filter(t => t.prioridad === 1);
-  const mediaPrioridad = pendientes.filter(t => t.prioridad === 2);
-  const bajaPrioridad = pendientes.filter(t => t.prioridad === 3);
+  // Mezclar tareas de Anota con tareas de Google
+  const tareasAnotaPendientes = pendientes;
+  const tareasAnotaCompletadas = completadas;
+  const tareasGooglePendientes = googleTasks
+    .filter(gt => gt.status === 'needsAction')
+    .map(convertirGoogleTaskATarea);
+  const tareasGoogleCompletadas = googleTasks
+    .filter(gt => gt.status === 'completed')
+    .map(convertirGoogleTaskATarea);
+
+  // Combinar listas
+  const pendientesCombinadas = [...tareasAnotaPendientes, ...tareasGooglePendientes];
+  const completadasCombinadas = [...tareasAnotaCompletadas, ...tareasGoogleCompletadas];
+  
+  const tareas = vista === 'pendientes' ? pendientesCombinadas : completadasCombinadas;
+  const total = pendientesCombinadas.length + completadasCombinadas.length;
+  const porcentaje = total > 0 ? Math.round((completadasCombinadas.length / total) * 100) : 0;
+
+  // Agrupar pendientes por prioridad (solo de Anota para estadísticas)
+  const altaPrioridad = tareasAnotaPendientes.filter(t => t.prioridad === 1);
+  const mediaPrioridad = tareasAnotaPendientes.filter(t => t.prioridad === 2);
+  const bajaPrioridad = tareasAnotaPendientes.filter(t => t.prioridad === 3);
+  
+  // Función para verificar si una tarea es de Google
+  const esTareaDeGoogle = (tareaId: string) => tareaId.startsWith('google-');
 
   if (isLoading) {
     return (
@@ -194,6 +383,7 @@ export const TareasPage = () => {
     const isEditing = tareaEditando?.id === t.id;
     const isDeleting = showDeleteConfirm === t.id;
     const vencida = !t.estaCompletada && estaVencida(t.fechaVencimiento);
+    const esGoogle = esTareaDeGoogle(t.id);
 
     return (
       <div
@@ -202,7 +392,7 @@ export const TareasPage = () => {
           t.estaCompletada
             ? 'border-l-green-400 bg-gray-50/80'
             : `${pri.border} bg-white hover:shadow-md`
-        }`}
+        } ${esGoogle ? 'ring-1 ring-blue-100' : ''}`}
       >
         <div className="flex items-start gap-3 px-3 sm:px-4 py-3">
           {/* Checkbox */}
@@ -214,6 +404,7 @@ export const TareasPage = () => {
                 ? 'bg-green-500 border-green-500'
                 : `border-gray-300 hover:border-gray-500 ${pri.ring} hover:ring-2`
             } disabled:opacity-50`}
+            title={esGoogle ? 'Marcar como completada en Google Tasks' : undefined}
           >
             {t.estaCompletada ? (
               <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
@@ -229,6 +420,19 @@ export const TareasPage = () => {
 
           {/* Contenido */}
           <div className="flex-1 min-w-0">
+            {!isEditing && esGoogle && (
+              <div className="flex items-center gap-1.5 mb-1">
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded text-[10px] font-medium">
+                  <svg className="w-2.5 h-2.5" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.18H12v4.16h6.01c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                  </svg>
+                  Google Tasks
+                </span>
+              </div>
+            )}
             {isEditing ? (
               <div className="space-y-3">
                 <input
@@ -240,7 +444,7 @@ export const TareasPage = () => {
                   autoFocus
                 />
                 <div className="flex items-center gap-2 flex-wrap">
-                  {PRIORIDADES.map((p) => (
+                  {!esTareaDeGoogle(tareaEditando.id) && PRIORIDADES.map((p) => (
                     <button
                       key={p.valor}
                       type="button"
@@ -254,6 +458,9 @@ export const TareasPage = () => {
                       {p.etiqueta}
                     </button>
                   ))}
+                  {esTareaDeGoogle(tareaEditando.id) && (
+                    <span className="text-xs text-gray-400 italic">Las tareas de Google no tienen prioridad</span>
+                  )}
                   <input
                     type="date"
                     value={editFechaVenc}
@@ -380,7 +587,7 @@ export const TareasPage = () => {
                 </h1>
                 {total > 0 && (
                   <span className="text-xs font-semibold text-gray-400">
-                    {completadas.length}/{total}
+                    {completadasCombinadas.length}/{total}
                   </span>
                 )}
               </div>
@@ -393,6 +600,40 @@ export const TareasPage = () => {
                 </svg>
                 Nueva tarea
               </button>
+            </div>
+
+            {/* Google Tasks - Estado de conexión */}
+            <div className="mt-3 pt-3 border-t border-gray-100">
+              {googleConnected ? (
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium">
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.18H12v4.16h6.01c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                      Google Tasks conectado
+                    </span>
+                    {googleEmail && <span className="text-xs text-gray-500 truncate max-w-[140px]">{googleEmail}</span>}
+                    {googleTasks.length > 0 && (
+                      <span className="text-xs text-gray-400">
+                        {googleTasks.filter(t => t.status === 'needsAction').length} pendientes, {googleTasks.filter(t => t.status === 'completed').length} completadas
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    onClick={desconectarGoogle}
+                    className="px-2.5 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    Desconectar
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={conectarGoogle}
+                  className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.18H12v4.16h6.01c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                  Conectar Google Tasks
+                </button>
+              )}
             </div>
 
             {/* Barra de progreso */}
@@ -420,11 +661,11 @@ export const TareasPage = () => {
                   }`}
                 >
                   Pendientes
-                  {pendientes.length > 0 && (
+                  {pendientesCombinadas.length > 0 && (
                     <span className={`ml-1.5 px-1.5 py-0.5 rounded-md text-[10px] font-bold ${
                       vista === 'pendientes' ? 'bg-black text-white' : 'bg-gray-200 text-gray-600'
                     }`}>
-                      {pendientes.length}
+                      {pendientesCombinadas.length}
                     </span>
                   )}
                 </button>
@@ -437,11 +678,11 @@ export const TareasPage = () => {
                   }`}
                 >
                   Completadas
-                  {completadas.length > 0 && (
+                  {completadasCombinadas.length > 0 && (
                     <span className={`ml-1.5 px-1.5 py-0.5 rounded-md text-[10px] font-bold ${
                       vista === 'completadas' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-600'
                     }`}>
-                      {completadas.length}
+                      {completadasCombinadas.length}
                     </span>
                   )}
                 </button>
