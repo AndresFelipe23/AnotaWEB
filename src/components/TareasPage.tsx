@@ -36,8 +36,6 @@ export const TareasPage = () => {
   const [googleConnected, setGoogleConnected] = useState(false);
   const [googleEmail, setGoogleEmail] = useState<string | null>(null);
   const [googleTasks, setGoogleTasks] = useState<GoogleTask[]>([]);
-  const [loadingGoogle, setLoadingGoogle] = useState(false);
-  const [showGoogleTasks, setShowGoogleTasks] = useState(false);
 
   useEffect(() => { cargarTareas(); }, []);
 
@@ -68,7 +66,6 @@ export const TareasPage = () => {
   };
 
   const cargarGoogleTasks = async () => {
-    setLoadingGoogle(true);
     try {
       const tasks = await apiService.getGoogleTasks();
       setGoogleTasks(tasks);
@@ -83,8 +80,6 @@ export const TareasPage = () => {
         message: e?.response?.data?.message || e?.message || 'No se pudieron cargar las tareas de Google', 
         position: 'topRight' 
       });
-    } finally {
-      setLoadingGoogle(false);
     }
   };
 
