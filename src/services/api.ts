@@ -235,6 +235,11 @@ class ApiService {
     return response.data;
   }
 
+  async obtenerTareasPorNotaVinculada(notaVinculadaId: string): Promise<Tarea[]> {
+    const response = await this.api.get<Tarea[]>('/api/tareas', { params: { notaVinculadaId } });
+    return response.data;
+  }
+
   async crearTarea(data: CrearTareaRequest): Promise<{ id: string }> {
     const response = await this.api.post<{ id: string }>('/api/tareas', data);
     return response.data;

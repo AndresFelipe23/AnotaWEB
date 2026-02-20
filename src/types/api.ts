@@ -127,6 +127,7 @@ export interface Tarea {
   id: string;
   usuarioId: string;
   notaVinculadaId?: string;
+  tituloNotaVinculada?: string;
   descripcion: string;
   estaCompletada: boolean;
   prioridad: number;

@@ -3,7 +3,7 @@ import { Layout } from './Layout';
 import { useSearchParams } from 'react-router-dom';
 import { apiService } from '../services/api';
 import iziToast from 'izitoast';
-import type { Nota, NotaResumen, ActualizarNotaRequest, CrearNotaRequest, CarpetaArbol, Etiqueta } from '../types/api';
+import type { Nota, NotaResumen, ActualizarNotaRequest, CrearNotaRequest, CarpetaArbol, Etiqueta, Tarea, CrearTareaRequest } from '../types/api';
 import { BlockEditor, type BlockEditorRef } from './BlockEditor';
 import { FormattingToolbar } from './FormattingToolbar';
 
@@ -49,6 +49,7 @@ export const NotasPage = () => {
   const [showEtiquetasPicker, setShowEtiquetasPicker] = useState(false);
   const [etiquetas, setEtiquetas] = useState<Etiqueta[]>([]);
   const [nuevaEtiquetaNombre, setNuevaEtiquetaNombre] = useState('');
+  const [nuevaEtiquetaColor, setNuevaEtiquetaColor] = useState('#6366f1');
   const [creandoEtiqueta, setCreandoEtiqueta] = useState(false);
   const [seccionesExpandidas, setSeccionesExpandidas] = useState<Set<string>>(new Set(['sin-carpeta']));
   const [sidebarNotasColapsado, setSidebarNotasColapsado] = useState(false);
@@ -56,6 +57,12 @@ export const NotasPage = () => {
   const [searchParams] = useSearchParams();
   const searchTerm = (searchParams.get('search') || '').toLowerCase();
   const openId = searchParams.get('open');
+  // Tareas vinculadas a la nota abierta
+  const [tareasVinculadas, setTareasVinculadas] = useState<Tarea[]>([]);
+  const [cargandoTareasVinculadas, setCargandoTareasVinculadas] = useState(false);
+  const [nuevaTareaDescripcion, setNuevaTareaDescripcion] = useState('');
+  const [creandoTarea, setCreandoTarea] = useState(false);
+  const [tareaAlternandoId, setTareaAlternandoId] = useState<string | null>(null);
 
   useEffect(() => {
     cargarCarpetas();
@@ -156,6 +163,61 @@ export const NotasPage = () => {
     }
   }, [openId]);
 
+  const cargarTareasVinculadas = async () => {
+    if (!notaSeleccionada?.id) {
+      setTareasVinculadas([]);
+      return;
+    }
+    try {
+      setCargandoTareasVinculadas(true);
+      const list = await apiService.obtenerTareasPorNotaVinculada(notaSeleccionada.id);
+      setTareasVinculadas(list);
+    } catch (e) {
+      console.error('Error al cargar tareas de la nota:', e);
+      setTareasVinculadas([]);
+    } finally {
+      setCargandoTareasVinculadas(false);
+    }
+  };
+
+  useEffect(() => {
+    if (notaSeleccionada?.id) cargarTareasVinculadas();
+    else setTareasVinculadas([]);
+  }, [notaSeleccionada?.id]);
+
+  const handleCrearTareaVinculada = async () => {
+    const desc = nuevaTareaDescripcion.trim();
+    if (!desc || !notaSeleccionada?.id) return;
+    try {
+      setCreandoTarea(true);
+      const payload: CrearTareaRequest = {
+        descripcion: desc,
+        notaVinculadaId: notaSeleccionada.id,
+        prioridad: 2,
+      };
+      await apiService.crearTarea(payload);
+      setNuevaTareaDescripcion('');
+      await cargarTareasVinculadas();
+      iziToast.success({ title: 'Tarea creada', message: 'Vinculada a esta nota.', position: 'topRight' });
+    } catch (e: any) {
+      iziToast.error({ title: 'Error', message: e?.response?.data?.message || 'No se pudo crear la tarea', position: 'topRight' });
+    } finally {
+      setCreandoTarea(false);
+    }
+  };
+
+  const handleAlternarTareaVinculada = async (tareaId: string) => {
+    try {
+      setTareaAlternandoId(tareaId);
+      await apiService.alternarEstadoTarea(tareaId);
+      await cargarTareasVinculadas();
+    } catch (e: any) {
+      iziToast.error({ title: 'Error', message: e?.response?.data?.message || 'No se pudo actualizar la tarea', position: 'topRight' });
+    } finally {
+      setTareaAlternandoId(null);
+    }
+  };
+
   const handleNuevaNota = async () => {
     try {
       setIsSaving(true);
@@ -193,8 +255,9 @@ export const NotasPage = () => {
     if (!nombre) return;
     try {
       setCreandoEtiqueta(true);
-      const { id } = await apiService.crearEtiqueta({ nombre });
-      const nueva: Etiqueta = { id, usuarioId: '', nombre, fechaCreacion: new Date().toISOString() };
+      const colorHex = nuevaEtiquetaColor || undefined;
+      const { id } = await apiService.crearEtiqueta({ nombre, colorHex });
+      const nueva: Etiqueta = { id, usuarioId: '', nombre, colorHex, fechaCreacion: new Date().toISOString() };
       setEtiquetas(prev => [...prev, nueva]);
       setNuevaEtiquetaNombre('');
       if (notaSeleccionada) {
@@ -824,6 +887,69 @@ export const NotasPage = () => {
                         hideToolbar
                       />
                     </div>
+
+                    {/* Tareas vinculadas a esta nota */}
+                    <div className="mt-6 pt-4 border-t border-gray-100">
+                      <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                        <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                        </svg>
+                        Tareas de esta nota
+                      </h3>
+                      {cargandoTareasVinculadas ? (
+                        <p className="text-sm text-gray-400">Cargando tareas...</p>
+                      ) : (
+                        <>
+                          <ul className="space-y-1.5 mb-3">
+                            {tareasVinculadas.map((t) => (
+                              <li key={t.id} className="flex items-center gap-2 group">
+                                <button
+                                  type="button"
+                                  onClick={() => handleAlternarTareaVinculada(t.id)}
+                                  disabled={tareaAlternandoId === t.id}
+                                  className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                                    t.estaCompletada ? 'bg-green-500 border-green-500' : 'border-gray-300 hover:border-gray-500'
+                                  } disabled:opacity-50`}
+                                >
+                                  {t.estaCompletada && (
+                                    <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  )}
+                                  {tareaAlternandoId === t.id && !t.estaCompletada && (
+                                    <svg className="w-2.5 h-2.5 animate-spin text-gray-400" fill="none" viewBox="0 0 24 24">
+                                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                    </svg>
+                                  )}
+                                </button>
+                                <span className={`text-sm flex-1 min-w-0 ${t.estaCompletada ? 'line-through text-gray-400' : 'text-gray-700'}`}>
+                                  {t.descripcion}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={nuevaTareaDescripcion}
+                              onChange={(e) => setNuevaTareaDescripcion(e.target.value)}
+                              onKeyDown={(e) => e.key === 'Enter' && handleCrearTareaVinculada()}
+                              placeholder="Nueva tarea vinculada a esta nota..."
+                              className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black"
+                            />
+                            <button
+                              type="button"
+                              onClick={handleCrearTareaVinculada}
+                              disabled={creandoTarea || !nuevaTareaDescripcion.trim()}
+                              className="px-4 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-40 transition-colors"
+                            >
+                              {creandoTarea ? '...' : 'Añadir'}
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -848,18 +974,55 @@ export const NotasPage = () => {
                       <span className="text-xs text-gray-500">
                         {new Date(notaSeleccionada.fechaActualizacion).toLocaleString('es-ES')}
                       </span>
-                      <div className="relative">
-                        <button
-                          type="button"
-                          onClick={() => setShowMoverCarpeta(!showMoverCarpeta)}
-                          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors flex items-center gap-1"
-                          title="Mover a carpeta"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                          </svg>
-                          <span className="text-xs hidden sm:inline">Mover</span>
-                        </button>
+                      <div className="flex items-center gap-1">
+                        {/* Mover a carpeta */}
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() => { setShowEtiquetasPicker(false); setShowMoverCarpeta(!showMoverCarpeta); }}
+                            className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors flex items-center gap-1"
+                            title="Mover a carpeta"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                            </svg>
+                            <span className="text-xs hidden sm:inline">Mover</span>
+                          </button>
+                          {showMoverCarpeta && (
+                            <>
+                              <div className="fixed inset-0 z-[100]" onClick={() => setShowMoverCarpeta(false)} aria-hidden="true" />
+                              <div className="absolute left-0 bottom-full mb-1 z-[110] py-2 bg-white border border-gray-200 rounded-xl shadow-lg min-w-[200px] max-h-60 overflow-y-auto">
+                                <button
+                                  type="button"
+                                  onClick={() => handleMoverNota(notaSeleccionada.id, null)}
+                                  className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 hover:bg-gray-50 ${
+                                    !notaSeleccionada.carpetaId ? 'bg-gray-100 font-medium' : ''
+                                  }`}
+                                >
+                                  <span>📋</span> Sin carpeta
+                                </button>
+                                {carpetas.map((c) => (
+                                  <button
+                                    key={c.id}
+                                    type="button"
+                                    onClick={() => handleMoverNota(notaSeleccionada.id, c.id)}
+                                    style={{ paddingLeft: `${16 + (c.nivel || 0) * 12}px` }}
+                                    className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 hover:bg-gray-50 truncate ${
+                                      notaSeleccionada.carpetaId === c.id ? 'bg-gray-100 font-medium' : ''
+                                    }`}
+                                  >
+                                    <span className="shrink-0">{c.icono || '📁'}</span>
+                                    <span className="truncate">{c.nombre}</span>
+                                  </button>
+                                ))}
+                                {carpetas.length === 0 && (
+                                  <p className="px-4 py-2 text-xs text-gray-500">Crea carpetas en la sección Carpetas</p>
+                                )}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                        {/* Etiquetas */}
                         <div className="relative">
                           <button
                             type="button"
@@ -920,61 +1083,37 @@ export const NotasPage = () => {
                                       </div>
                                     );
                                   })}
-                                <div className="mt-2 pt-2 border-t border-gray-100 flex gap-2 px-2">
-                                  <input
-                                    type="text"
-                                    value={nuevaEtiquetaNombre}
-                                    onChange={(e) => setNuevaEtiquetaNombre(e.target.value)}
-                                    onKeyDown={(e) => e.key === 'Enter' && handleCrearEtiqueta()}
-                                    placeholder="Nueva etiqueta..."
-                                    className="flex-1 px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/20"
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={handleCrearEtiqueta}
-                                    disabled={!nuevaEtiquetaNombre.trim() || creandoEtiqueta}
-                                    className="px-3 py-1.5 text-sm font-medium bg-black text-white rounded-lg hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed"
-                                  >
-                                    {creandoEtiqueta ? '...' : 'Crear'}
-                                  </button>
+                                <div className="mt-2 pt-2 border-t border-gray-100 space-y-2 px-2">
+                                  <div className="flex gap-2 items-center">
+                                    <input
+                                      type="color"
+                                      value={nuevaEtiquetaColor}
+                                      onChange={(e) => setNuevaEtiquetaColor(e.target.value)}
+                                      title="Color de la etiqueta"
+                                      className="w-8 h-8 rounded-lg border border-gray-200 cursor-pointer bg-transparent"
+                                    />
+                                    <input
+                                      type="text"
+                                      value={nuevaEtiquetaNombre}
+                                      onChange={(e) => setNuevaEtiquetaNombre(e.target.value)}
+                                      onKeyDown={(e) => e.key === 'Enter' && handleCrearEtiqueta()}
+                                      placeholder="Nueva etiqueta..."
+                                      className="flex-1 px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/20"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={handleCrearEtiqueta}
+                                      disabled={!nuevaEtiquetaNombre.trim() || creandoEtiqueta}
+                                      className="px-3 py-1.5 text-sm font-medium bg-black text-white rounded-lg hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed"
+                                    >
+                                      {creandoEtiqueta ? '...' : 'Crear'}
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
                             </>
                           )}
                         </div>
-                        {showMoverCarpeta && (
-                          <>
-                            <div className="fixed inset-0 z-[100]" onClick={() => setShowMoverCarpeta(false)} aria-hidden="true" />
-                            <div className="absolute left-0 bottom-full mb-1 z-[110] py-2 bg-white border border-gray-200 rounded-xl shadow-lg min-w-[200px] max-h-60 overflow-y-auto">
-                              <button
-                                type="button"
-                                onClick={() => handleMoverNota(notaSeleccionada.id, null)}
-                                className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 hover:bg-gray-50 ${
-                                  !notaSeleccionada.carpetaId ? 'bg-gray-100 font-medium' : ''
-                                }`}
-                              >
-                                <span>📋</span> Sin carpeta
-                              </button>
-                              {carpetas.map((c) => (
-                                <button
-                                  key={c.id}
-                                  type="button"
-                                  onClick={() => handleMoverNota(notaSeleccionada.id, c.id)}
-                                  style={{ paddingLeft: `${16 + (c.nivel || 0) * 12}px` }}
-                                  className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 hover:bg-gray-50 truncate ${
-                                    notaSeleccionada.carpetaId === c.id ? 'bg-gray-100 font-medium' : ''
-                                  }`}
-                                >
-                                  <span className="shrink-0">{c.icono || '📁'}</span>
-                                  <span className="truncate">{c.nombre}</span>
-                                </button>
-                              ))}
-                              {carpetas.length === 0 && (
-                                <p className="px-4 py-2 text-xs text-gray-500">Crea carpetas en la sección Carpetas</p>
-                              )}
-                            </div>
-                          </>
-                        )}
                       </div>
                       <div className="flex items-center gap-1">
                         <button

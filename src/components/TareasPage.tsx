@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { Layout } from './Layout';
 import { apiService } from '../services/api';
 import type { Tarea, CrearTareaRequest, ActualizarTareaRequest, GoogleTask } from '../types/api';
@@ -514,6 +514,18 @@ export const TareasPage = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       {formatFecha(t.fechaCompletada)}
+                    </span>
+                  )}
+                  {t.notaVinculadaId && (
+                    <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
+                      Vinculada a:{' '}
+                      <Link
+                        to={`/notas?open=${t.notaVinculadaId}`}
+                        className="text-indigo-600 hover:underline font-medium"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {t.tituloNotaVinculada || 'Nota'}
+                      </Link>
                     </span>
                   )}
                 </div>
