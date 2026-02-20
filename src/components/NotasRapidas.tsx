@@ -47,7 +47,6 @@ export const NotasRapidas = () => {
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<InstanceType<SpeechRecognitionCtor> | null>(null);
   const interimRef = useRef('');
   // Refs to avoid stale closures inside recognition handlers
@@ -78,9 +77,6 @@ export const NotasRapidas = () => {
 
   // Animación de entrada con GSAP
   useEffect(() => {
-    if (titleRef.current) {
-      gsap.fromTo(titleRef.current, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' });
-    }
     if (containerRef.current) {
       gsap.fromTo(containerRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, delay: 0.2, ease: 'power3.out' });
     }
@@ -414,128 +410,93 @@ export const NotasRapidas = () => {
   };
 
   return (
-    <div className="w-full min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex items-center justify-center pt-6 sm:pt-10 pb-safe px-4 sm:px-6">
-      <div className="w-full max-w-5xl">
-        {/* Título principal */}
-        <div ref={titleRef} className="mb-6 sm:mb-10">
-          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-light text-black tracking-tight" style={{ fontFamily: "'Inter', sans-serif", letterSpacing: '-0.03em' }}>
-            Notas Rápidas
-          </h1>
-        </div>
-
-        {/* Tarjeta del editor */}
+    <div
+      ref={containerRef}
+      className="w-full min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-slate-100"
+      style={{ backgroundImage: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%)' }}
+    >
+      <div className="w-full max-w-4xl flex flex-col" style={{ minHeight: 'min(calc(100vh - 6rem), 720px)' }}>
+        {/* Card tipo glass + más ancha y alta */}
         <div
-          ref={containerRef}
-          className={`relative bg-white border-2 rounded-2xl sm:rounded-3xl transition-all duration-300 ${
+          className={`flex-1 flex flex-col rounded-[1.75rem] transition-all duration-300 overflow-hidden ${
             isFocused
-              ? 'border-black shadow-[0_20px_50px_rgba(0,0,0,0.15)]'
-              : 'border-gray-200 hover:border-gray-300 shadow-[0_10px_30px_rgba(0,0,0,0.08)]'
+              ? 'shadow-[0_0_0_2px_rgba(99,102,241,0.25),0_25px_70px_-18px_rgba(99,102,241,0.2)]'
+              : 'shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_16px_48px_-16px_rgba(0,0,0,0.14)]'
           }`}
         >
-          <div className="p-4 sm:p-6 lg:p-10">
-            {/* Header del editor */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 sm:mb-6 pb-4 border-b border-gray-200">
-              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-                <div className="p-2 bg-gray-100 rounded-lg flex-shrink-0">
-                  <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                </div>
-                <h2 className="text-lg sm:text-xl font-semibold text-black" style={{ fontFamily: "'Inter', sans-serif" }}>
-                  Nueva Nota
-                </h2>
-
-                {/* Botón de dictado */}
-                <button
-                  type="button"
-                  onClick={toggleDictado}
-                  disabled={!SpeechRecognitionAPI}
-                  title={SpeechRecognitionAPI ? (isListening ? 'Detener dictado (Ctrl+M)' : 'Dictar con voz (Ctrl+M)') : 'Tu navegador no soporta dictado'}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 touch-manipulation ${
-                    isListening
-                      ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed'
-                  }`}
-                >
-                  {isListening ? (
-                    <>
-                      {/* Barras de nivel de audio */}
-                      <div className="flex items-end gap-[2px] h-4 w-6">
-                        {audioLevel.map((level, i) => (
-                          <div
-                            key={i}
-                            className="flex-1 bg-red-500 rounded-full transition-all duration-75"
-                            style={{ height: `${Math.max(20, level * 100)}%` }}
-                          />
-                        ))}
-                      </div>
-                      <span className="hidden sm:inline">Detener</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                      </svg>
-                      <span className="hidden sm:inline">Dictar</span>
-                    </>
-                  )}
-                </button>
-
-                {/* Botón deshacer última frase (solo mientras dicta y hay historial) */}
+          <div className="flex-1 flex flex-col min-h-0 bg-white/90 backdrop-blur-xl border border-white/70">
+            {/* Barra superior: título + controles */}
+            <div className="flex-shrink-0 flex items-center justify-between gap-3 px-6 sm:px-8 py-4 border-b border-slate-200/80">
+              <span className="text-sm font-semibold text-slate-500">Notas Rápidas</span>
+              <div className="flex items-center gap-2">
+                {isListening && (
+                  <span className="text-xs font-mono tabular-nums text-indigo-600 font-medium">{formatTime(listenSeconds)}</span>
+                )}
+                {textoVisible && !isListening && (
+                  <span className="text-xs text-slate-400">{textoVisible.length}</span>
+                )}
                 {isListening && canUndo && (
                   <button
                     type="button"
                     onClick={undoLastSentence}
-                    title="Deshacer última frase (Ctrl+Z)"
-                    className="flex items-center gap-1 px-2.5 py-2 rounded-xl text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition-all duration-200 touch-manipulation"
+                    title="Deshacer (Ctrl+Z)"
+                    className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                     </svg>
-                    <span className="hidden sm:inline text-xs">Deshacer</span>
                   </button>
                 )}
-              </div>
-
-              <div className="flex items-center gap-3">
-                {/* Contador de tiempo de dictado */}
-                {isListening && (
-                  <span className="text-sm font-mono font-semibold text-red-600 tabular-nums">
-                    {formatTime(listenSeconds)}
-                  </span>
-                )}
-                {textoVisible && (
-                  <span className="text-sm text-gray-500 font-medium">
-                    {textoVisible.length} caracteres
-                  </span>
-                )}
+                <button
+                  type="button"
+                  onClick={toggleDictado}
+                  disabled={!SpeechRecognitionAPI}
+                  title={SpeechRecognitionAPI ? (isListening ? 'Detener (Ctrl+M)' : 'Dictar (Ctrl+M)') : 'Dictado no disponible'}
+                  className={`p-2.5 rounded-xl transition-all touch-manipulation ${
+                    isListening
+                      ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 disabled:opacity-40 disabled:cursor-not-allowed'
+                  }`}
+                >
+                  {isListening ? (
+                    <div className="flex items-end gap-0.5 h-4 w-5 justify-center">
+                      {audioLevel.map((level, i) => (
+                        <div
+                          key={i}
+                          className="w-1 bg-white rounded-full transition-all duration-75 flex-1 min-h-1"
+                          style={{ height: `${Math.max(20, level * 100)}%` }}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                  )}
+                </button>
               </div>
             </div>
 
-            {/* Estado de transcripción (solo al dictar) */}
+            {/* Estado dictado */}
             {isListening && (
-              <div className="flex items-center gap-2 mb-3 px-1">
+              <div className="flex-shrink-0 flex items-center gap-2 px-6 sm:px-8 py-2.5 bg-indigo-50/90 border-b border-indigo-100">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500" />
                 </span>
-                <span className="text-sm font-medium text-emerald-700">
+                <span className="text-xs font-medium text-indigo-700">
                   {interimTranscript ? 'Transcribiendo...' : 'Escuchando...'}
                 </span>
                 {interimTranscript && (
-                  <span className="text-sm text-gray-400 truncate max-w-[200px] sm:max-w-xs" title={interimTranscript}>
+                  <span className="text-xs text-slate-500 truncate max-w-[200px] sm:max-w-sm" title={interimTranscript}>
                     «{interimTranscript}»
                   </span>
                 )}
               </div>
             )}
 
-            {/* Área de texto */}
-            <div
-              className={`relative mb-6 transition-all duration-300 rounded-xl ${
-                isListening ? 'ring-2 ring-emerald-200 ring-offset-2 ring-offset-white' : ''
-              }`}
-            >
+            {/* Área de texto: más altura y padding */}
+            <div className={`flex-1 min-h-0 flex flex-col px-6 sm:px-8 py-5 sm:py-6 transition-all ${isListening ? 'ring-2 ring-indigo-100 ring-inset rounded-2xl' : ''}`}>
               <textarea
                 ref={textareaRef}
                 value={textoVisible}
@@ -548,82 +509,48 @@ export const NotasRapidas = () => {
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setTimeout(() => setIsFocused(false), 200)}
                 onKeyDown={handleKeyDown}
-                placeholder={SpeechRecognitionAPI ? 'Escribe o pulsa el micrófono para dictar... (Ctrl+M)' : 'Comienza a escribir tu nota...'}
-                className="w-full min-h-[200px] sm:min-h-[280px] lg:min-h-[340px] p-0 border-none outline-none resize-none text-black placeholder-gray-400 bg-transparent text-base sm:text-lg leading-relaxed focus:outline-none rounded-xl"
-                style={{ fontFamily: "'Inter', sans-serif", fontSize: '1.125rem', lineHeight: '2rem' }}
+                placeholder={SpeechRecognitionAPI ? 'Escribe o dicta con el micrófono (Ctrl+M)' : '¿Qué tienes en mente?'}
+                className="w-full flex-1 min-h-[280px] sm:min-h-[360px] lg:min-h-[420px] p-0 border-none outline-none resize-none bg-transparent text-slate-800 placeholder-slate-400 focus:outline-none text-base sm:text-lg lg:text-[1.125rem] leading-[1.85] sm:leading-[2]"
+                style={{ fontFamily: "'Inter', sans-serif" }}
               />
             </div>
 
-            {/* Footer con atajos y botones */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 sm:pt-6 border-t-2 border-gray-100">
-              {/* Atajos de teclado */}
-              <div className="hidden sm:flex items-center gap-3 flex-wrap">
-                {[
-                  { keys: ['Ctrl', 'Enter'], label: 'Guardar' },
-                  { keys: ['Ctrl', 'M'], label: 'Micrófono' },
-                  { keys: ['Esc'], label: 'Cancelar' },
-                ].map(({ keys, label }, idx) => (
-                  <div key={idx} className="flex items-center gap-2">
-                    {idx > 0 && <div className="w-px h-4 bg-gray-300" />}
-                    <div className="flex items-center gap-1">
-                      {keys.map((k, ki) => (
-                        <span key={ki} className="flex items-center gap-1">
-                          <kbd className="px-2.5 py-1 bg-gray-100 text-gray-700 border border-gray-300 rounded-lg text-xs font-semibold shadow-sm">{k}</kbd>
-                          {ki < keys.length - 1 && <span className="text-gray-400 text-xs">+</span>}
-                        </span>
-                      ))}
-                    </div>
-                    <span className="text-sm text-gray-500">{label}</span>
-                  </div>
-                ))}
+            {/* Footer: atajos + acciones */}
+            <div className="flex-shrink-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-6 sm:px-8 py-4 bg-slate-50/90 border-t border-slate-200/80">
+              <div className="hidden sm:flex items-center gap-3 text-xs text-slate-400">
+                <span><kbd className="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-500">⌘</kbd><kbd className="ml-0.5 px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-500">Enter</kbd> guardar</span>
+                <span><kbd className="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-500">⌘</kbd><kbd className="ml-0.5 px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-500">M</kbd> dictar</span>
+                <span><kbd className="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-500">Esc</kbd> limpiar</span>
               </div>
-
-              {/* Botones de acción */}
-              <div className="flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
+              <div className="flex items-center gap-2 sm:ml-auto">
                 <button
                   onClick={limpiarCaja}
-                  className="flex-1 sm:flex-initial px-4 sm:px-6 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 border border-gray-200 touch-manipulation"
+                  className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-200/80 rounded-xl transition-colors touch-manipulation"
                   disabled={isSaving}
                 >
-                  Cancelar
+                  Limpiar
                 </button>
                 <button
                   onClick={handleSave}
                   disabled={isSaving || !textoVisible.trim()}
-                  className="flex-1 sm:flex-initial w-full sm:w-auto px-4 sm:px-8 py-2.5 text-sm font-semibold text-white bg-black hover:bg-gray-800 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl shadow-lg hover:shadow-xl flex items-center justify-center gap-2 touch-manipulation"
+                  className="px-5 py-2.5 text-sm font-semibold text-white bg-indigo-500 hover:bg-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2 touch-manipulation transition-all"
                 >
                   {isSaving ? (
-                    <>
-                      <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Guardando...
-                    </>
+                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
                   ) : (
-                    <>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="sm:hidden">Guardar</span>
-                      <span className="hidden sm:inline">Guardar Nota</span>
-                    </>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
                   )}
+                  {isSaving ? 'Guardando...' : 'Guardar'}
                 </button>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Indicador de ayuda */}
-        {!contenido && !isFocused && (
-          <div className="hidden sm:flex mt-6 items-center gap-2 text-sm text-gray-400">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-            </svg>
-            Usa los atajos de teclado para una experiencia más rápida
-          </div>
-        )}
       </div>
     </div>
   );
