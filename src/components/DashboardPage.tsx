@@ -224,7 +224,7 @@ export const DashboardPage = () => {
         </div>
 
         {/* ─── Contenido scrollable ─── */}
-        <div className="flex-1 overflow-y-auto bg-gray-50/50 px-4 sm:px-6 pb-8 pb-safe">
+        <div className="flex-1 overflow-y-auto bg-white px-4 sm:px-6 pb-8 pb-safe">
           {/* ═══ Carpetas ═══ */}
           <section className="mt-4 sm:mt-5 mb-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">

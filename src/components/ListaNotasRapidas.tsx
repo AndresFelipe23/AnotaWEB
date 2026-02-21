@@ -381,7 +381,7 @@ export const ListaNotasRapidas = () => {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto scrollbar-hide px-4 py-4 space-y-3 bg-gray-50/60">
+            <div className="flex-1 overflow-y-auto scrollbar-hide px-4 py-4 space-y-3 bg-white">
               {isLoadingArchivadas ? (
                 <div className="flex items-center justify-center h-full text-xs text-gray-500">
                   Cargando notas archivadas...
@@ -472,9 +472,9 @@ export const ListaNotasRapidas = () => {
         </div>
       )}
       {/* Layout 2 Columnas / Responsive */}
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden bg-gray-50/60">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden bg-white">
         {/* Sidebar de Notas */}
-        <div className="w-full lg:w-96 flex-shrink-0 border-b lg:border-b-0 lg:border-r border-gray-100 bg-gray-50 flex flex-col overflow-hidden">
+        <div className="w-full lg:w-96 flex-shrink-0 border-b lg:border-b-0 lg:border-r border-gray-100 bg-white flex flex-col overflow-hidden">
           {/* Lista de Notas */}
           <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-2 scrollbar-hide pt-4 px-2 sm:px-4">
             {notas.length === 0 ? (
@@ -568,7 +568,7 @@ export const ListaNotasRapidas = () => {
         </div>
 
         {/* Panel de Contenido */}
-        <div className="flex-1 flex flex-col overflow-hidden bg-gray-50">
+        <div className="flex-1 flex flex-col overflow-hidden bg-white">
           {!notaSeleccionada ? (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center max-w-md">

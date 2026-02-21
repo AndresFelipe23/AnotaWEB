@@ -310,7 +310,7 @@ export const MeetingTranscriberPage = () => {
 
   return (
     <Layout>
-      <div className="min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex flex-col bg-gray-50/50">
+      <div className="min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex flex-col bg-white">
 
         {/* ── Header ── */}
         <div className="flex-shrink-0 bg-white border-b border-gray-100 px-4 sm:px-6 py-3 sm:py-4">

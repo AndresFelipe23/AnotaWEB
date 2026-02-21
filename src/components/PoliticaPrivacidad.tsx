@@ -13,7 +13,7 @@ const styles = {
 
 export function PoliticaPrivacidad() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className={styles.wrap}>
         <Link to="/" className={styles.back}>← Volver a Anota</Link>
         <h1 className={styles.h1}>Política de Privacidad</h1>

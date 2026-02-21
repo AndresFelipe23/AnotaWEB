@@ -6,9 +6,9 @@ import type { Tarea, CrearTareaRequest, ActualizarTareaRequest, GoogleTask } fro
 import iziToast from 'izitoast';
 
 const PRIORIDADES = [
-  { valor: 1, etiqueta: 'Alta', color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-500', dot: 'bg-red-500', ring: 'ring-red-100' },
-  { valor: 2, etiqueta: 'Media', color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-400', dot: 'bg-amber-400', ring: 'ring-amber-100' },
-  { valor: 3, etiqueta: 'Baja', color: 'text-gray-500', bg: 'bg-gray-50', border: 'border-gray-300', dot: 'bg-gray-400', ring: 'ring-gray-100' },
+  { valor: 1, etiqueta: 'Alta', color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-500', borderL: 'border-l-red-500', dot: 'bg-red-500', ring: 'ring-red-100' },
+  { valor: 2, etiqueta: 'Media', color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-400', borderL: 'border-l-amber-400', dot: 'bg-amber-400', ring: 'ring-amber-100' },
+  { valor: 3, etiqueta: 'Baja', color: 'text-gray-500', bg: 'bg-gray-50', border: 'border-gray-300', borderL: 'border-l-gray-400', dot: 'bg-gray-400', ring: 'ring-gray-100' },
 ];
 
 export const TareasPage = () => {
@@ -363,7 +363,7 @@ export const TareasPage = () => {
   if (isLoading) {
     return (
       <Layout>
-        <div className="w-full min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50/60">
+        <div className="w-full min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex items-center justify-center bg-white">
           <div className="text-center">
             <div className="w-12 h-12 mx-auto mb-4 border-3 border-gray-200 border-t-black rounded-full animate-spin" />
             <p className="text-sm text-gray-500">Cargando tareas...</p>
@@ -383,18 +383,18 @@ export const TareasPage = () => {
     return (
       <div
         key={t.id}
-        className={`group relative rounded-xl border-l-[3px] transition-all duration-200 ${
+        className={`group relative rounded-2xl border transition-all duration-200 ${
           t.estaCompletada
-            ? 'border-l-green-400 bg-gray-50/80'
-            : `${pri.border} bg-white hover:shadow-md`
-        } ${esGoogle ? 'ring-1 ring-blue-100' : ''}`}
+            ? 'border border-gray-200 bg-gray-50/90 shadow-sm border-l-4 border-l-green-500'
+            : `border border-gray-200 bg-white shadow-sm hover:shadow-md hover:border-gray-300 border-l-4 ${pri.borderL}`
+        } ${esGoogle ? 'ring-1 ring-blue-100 border-blue-200' : ''}`}
       >
-        <div className="flex items-start gap-3 px-3 sm:px-4 py-3">
+        <div className="flex items-start gap-4 px-4 sm:px-5 py-4">
           {/* Checkbox */}
           <button
             onClick={() => handleAlternar(t.id)}
             disabled={tareaAlternandoId === t.id}
-            className={`mt-0.5 flex-shrink-0 w-6 h-6 sm:w-5 sm:h-5 rounded-md border-2 flex items-center justify-center transition-all duration-200 touch-manipulation ${
+            className={`mt-0.5 flex-shrink-0 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-200 touch-manipulation ${
               t.estaCompletada
                 ? 'bg-green-500 border-green-500'
                 : `border-gray-300 hover:border-gray-500 ${pri.ring} hover:ring-2`
@@ -429,13 +429,13 @@ export const TareasPage = () => {
               </div>
             )}
             {isEditing ? (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <input
                   type="text"
                   value={editDescripcion}
                   onChange={(e) => setEditDescripcion(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleGuardarEdicion()}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-[15px] focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black"
                   autoFocus
                 />
                 <div className="flex items-center gap-2 flex-wrap">
@@ -444,7 +444,7 @@ export const TareasPage = () => {
                       key={p.valor}
                       type="button"
                       onClick={() => setEditPrioridad(p.valor)}
-                      className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
+                      className={`px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all ${
                         editPrioridad === p.valor
                           ? `${p.bg} ${p.color} ${p.border} ring-1 ${p.ring}`
                           : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
@@ -460,19 +460,19 @@ export const TareasPage = () => {
                     type="date"
                     value={editFechaVenc}
                     onChange={(e) => setEditFechaVenc(e.target.value)}
-                    className="px-2.5 py-1 rounded-lg border border-gray-200 text-xs focus:outline-none focus:ring-1 focus:ring-black/20"
+                    className="px-3 py-1.5 rounded-xl border border-gray-200 text-xs focus:outline-none focus:ring-2 focus:ring-black/20"
                   />
-                  <div className="flex gap-1.5 ml-auto">
+                  <div className="flex gap-2 ml-auto">
                     <button
                       onClick={() => setTareaEditando(null)}
-                      className="px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors touch-manipulation"
+                      className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-xl transition-colors touch-manipulation"
                     >
                       Cancelar
                     </button>
                     <button
                       onClick={handleGuardarEdicion}
                       disabled={isGuardando || !editDescripcion.trim()}
-                      className="px-3 py-1.5 bg-black text-white rounded-lg text-xs font-semibold disabled:opacity-40 hover:bg-gray-800 transition-colors touch-manipulation"
+                      className="px-4 py-2 bg-black text-white rounded-xl text-sm font-semibold disabled:opacity-40 hover:bg-gray-800 transition-colors touch-manipulation"
                     >
                       {isGuardando ? 'Guardando...' : 'Guardar'}
                     </button>
@@ -484,81 +484,85 @@ export const TareasPage = () => {
                 onClick={() => !t.estaCompletada && handleAbrirEditar(t)}
                 className={!t.estaCompletada ? 'cursor-pointer touch-manipulation' : ''}
               >
-                <p className={`text-sm leading-relaxed ${
+                <p className={`text-[15px] sm:text-base leading-snug ${
                   t.estaCompletada
                     ? 'line-through text-gray-400'
-                    : 'text-gray-800 font-medium'
+                    : 'text-gray-900 font-medium'
                 }`}>
                   {t.descripcion}
                 </p>
-                <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                <div className="flex items-center gap-x-3 gap-y-1.5 mt-2 flex-wrap">
                   {!t.estaCompletada && (
-                    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold rounded-md ${pri.bg} ${pri.color}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${pri.dot}`} />
+                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs font-semibold rounded-lg ${pri.bg} ${pri.color}`}>
+                      <span className={`w-2 h-2 rounded-full ${pri.dot}`} />
                       {pri.etiqueta}
                     </span>
                   )}
                   {t.fechaVencimiento && (
-                    <span className={`inline-flex items-center gap-1 text-[11px] ${
-                      vencida ? 'text-red-600 font-semibold' : 'text-gray-400'
+                    <span className={`inline-flex items-center gap-1.5 text-xs ${
+                      vencida ? 'text-red-600 font-semibold' : 'text-gray-500'
                     }`}>
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                       {vencida && 'Vencida: '}{formatFecha(t.fechaVencimiento)}
                     </span>
                   )}
                   {t.estaCompletada && t.fechaCompletada && (
-                    <span className="inline-flex items-center gap-1 text-[11px] text-green-600">
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span className="inline-flex items-center gap-1.5 text-xs text-green-600">
+                      <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       {formatFecha(t.fechaCompletada)}
                     </span>
                   )}
                   {t.notaVinculadaId && (
-                    <span className="inline-flex items-center gap-1 text-[11px] text-gray-500">
-                      Vinculada a:{' '}
-                      <Link
-                        to={`/notas?open=${t.notaVinculadaId}`}
-                        className="text-indigo-600 hover:underline font-medium"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {t.tituloNotaVinculada || 'Nota'}
-                      </Link>
-                    </span>
+                    <Link
+                      to={`/notas?open=${t.notaVinculadaId}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-flex items-center gap-2 mt-1.5 px-2.5 py-1.5 rounded-xl border border-indigo-200 bg-indigo-50/80 text-indigo-800 hover:bg-indigo-100 hover:border-indigo-300 transition-colors text-xs font-medium w-fit max-w-full min-w-0"
+                      title="Abrir nota vinculada"
+                    >
+                      <svg className="w-3.5 h-3.5 shrink-0 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                      </svg>
+                      <span className="truncate">{t.tituloNotaVinculada || 'Nota vinculada'}</span>
+                      <svg className="w-3 h-3 shrink-0 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </Link>
                   )}
                 </div>
               </div>
             )}
           </div>
 
-          {/* Acciones: siempre visibles en móvil (no hay hover), hover en desktop */}
+          {/* Acciones */}
           {!isEditing && (
-            <div className="flex items-center gap-0.5 flex-shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-150">
+            <div className="flex items-center gap-1 flex-shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-150">
               {!t.estaCompletada && (
                 <button
                   onClick={() => handleAbrirEditar(t)}
-                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors touch-manipulation"
+                  className="p-2 rounded-xl hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors touch-manipulation"
                   title="Editar"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                 </button>
               )}
               {isDeleting ? (
-                <div className="flex items-center gap-1 bg-red-50 rounded-lg px-1">
+                <div className="flex items-center gap-1.5 bg-red-50 rounded-xl px-2 py-1">
                   <button
                     onClick={() => handleEliminar(t.id)}
                     disabled={tareaEliminandoId === t.id}
-                    className="px-2 py-1 text-[11px] font-bold text-white bg-red-600 rounded-md hover:bg-red-700 disabled:opacity-50 touch-manipulation"
+                    className="px-2.5 py-1.5 text-xs font-bold text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 touch-manipulation"
                   >
                     {tareaEliminandoId === t.id ? '...' : 'Eliminar'}
                   </button>
                   <button
                     onClick={() => setShowDeleteConfirm(null)}
-                    className="px-2 py-1 text-[11px] font-medium text-gray-600 hover:text-gray-800 touch-manipulation"
+                    className="px-2.5 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-800 touch-manipulation"
                   >
                     No
                   </button>
@@ -566,10 +570,10 @@ export const TareasPage = () => {
               ) : (
                 <button
                   onClick={() => setShowDeleteConfirm(t.id)}
-                  className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors touch-manipulation"
+                  className="p-2 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors touch-manipulation"
                   title="Eliminar"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                 </button>
@@ -583,7 +587,7 @@ export const TareasPage = () => {
 
   return (
     <Layout>
-      <div className="w-full min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex flex-col overflow-hidden bg-gray-50/60">
+      <div className="w-full min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex flex-col overflow-hidden bg-white">
         {/* Header con estadisticas */}
         <div className="flex-shrink-0 bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="max-w-4xl mx-auto">
@@ -820,7 +824,7 @@ export const TareasPage = () => {
                 </p>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {tareas.map(renderTarea)}
               </div>
             )}

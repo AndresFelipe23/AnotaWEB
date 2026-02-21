@@ -588,7 +588,7 @@ export const NotasPage = () => {
         </div>
 
         {/* Layout 2 columnas */}
-        <div className="flex-1 flex overflow-hidden bg-gray-50/60">
+        <div className="flex-1 flex overflow-hidden bg-white">
           {/* Lista de notas - Estilo Notion (colapsable) */}
           <aside
             className={`flex flex-col bg-white border-r border-gray-200 transition-all duration-200 ease-in-out shrink-0 overflow-hidden ${
