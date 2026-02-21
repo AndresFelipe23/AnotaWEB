@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { getLoginErrorMessage } from '../utils/authMessages';
 import logoSvg from '../assets/logo.svg';
 
 interface LoginProps {
@@ -12,16 +13,18 @@ export const Login = (_props: LoginProps) => {
   const [correo, setCorreo] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setIsLoading(true);
     try {
       await login({ correo, password });
       navigate('/');
-    } catch (error) {
-      // El error ya se maneja en el contexto
+    } catch (err) {
+      setError(getLoginErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -60,7 +63,7 @@ export const Login = (_props: LoginProps) => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 bg-white text-black placeholder-gray-400"
                 placeholder="tu@correo.com"
                 value={correo}
-                onChange={(e) => setCorreo(e.target.value)}
+                onChange={(e) => { setCorreo(e.target.value); setError(null); }}
               />
             </div>
 
@@ -77,9 +80,15 @@ export const Login = (_props: LoginProps) => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 bg-white text-black placeholder-gray-400"
                 placeholder="••••••••"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => { setPassword(e.target.value); setError(null); }}
               />
             </div>
+
+            {error && (
+              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800" role="alert">
+                {error}
+              </div>
+            )}
 
             <button
               type="submit"

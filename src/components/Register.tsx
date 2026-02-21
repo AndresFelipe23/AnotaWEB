@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { getRegisterErrorMessage } from '../utils/authMessages';
 import logoSvg from '../assets/logo.svg';
 
 interface RegisterProps {
@@ -15,15 +16,16 @@ export const Register = (_props: RegisterProps) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { register } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (password !== confirmPassword) {
+      setError('Las contraseñas no coinciden. Revisa y vuelve a intentar.');
       return;
     }
-
+    setError(null);
     setIsLoading(true);
     try {
       await register({
@@ -33,8 +35,8 @@ export const Register = (_props: RegisterProps) => {
         password,
       });
       navigate('/');
-    } catch (error) {
-      // El error ya se maneja en el contexto
+    } catch (err) {
+      setError(getRegisterErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -74,7 +76,7 @@ export const Register = (_props: RegisterProps) => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 bg-white text-black placeholder-gray-400"
                 placeholder="Juan"
                 value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
+                onChange={(e) => { setNombre(e.target.value); setError(null); }}
               />
             </div>
 
@@ -106,7 +108,7 @@ export const Register = (_props: RegisterProps) => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 bg-white text-black placeholder-gray-400"
                 placeholder="tu@correo.com"
                 value={correo}
-                onChange={(e) => setCorreo(e.target.value)}
+                onChange={(e) => { setCorreo(e.target.value); setError(null); }}
               />
             </div>
 
@@ -124,7 +126,7 @@ export const Register = (_props: RegisterProps) => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 bg-white text-black placeholder-gray-400"
                 placeholder="Mínimo 6 caracteres"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => { setPassword(e.target.value); setError(null); }}
               />
             </div>
 
@@ -145,12 +147,18 @@ export const Register = (_props: RegisterProps) => {
                 }`}
                 placeholder="Repite tu contraseña"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e) => { setConfirmPassword(e.target.value); setError(null); }}
               />
               {confirmPassword && !passwordsMatch && (
-                <p className="mt-1 text-sm text-gray-600">Las contraseñas no coinciden</p>
+                <p className="mt-1 text-sm text-red-600">Las contraseñas no coinciden</p>
               )}
             </div>
+
+            {error && (
+              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800" role="alert">
+                {error}
+              </div>
+            )}
 
             <button
               type="submit"

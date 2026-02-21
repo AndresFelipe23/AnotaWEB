@@ -63,14 +63,18 @@ class ApiService {
           const status = error.response.status;
 
           if (status === 401) {
-            // Token inválido o expirado - solo este error se muestra globalmente
-            localStorage.removeItem('token');
-            localStorage.removeItem('usuario');
-            window.location.href = '/login';
-            iziToast.error({
-              title: 'Sesión expirada',
-              message: 'Por favor, inicia sesión nuevamente',
-            });
+            // No redirigir si el 401 viene de login/registro (credenciales incorrectas)
+            const requestUrl = (error.config?.url ?? '').toString();
+            const isAuthAttempt = requestUrl.includes('/api/auth/login') || requestUrl.includes('/api/auth/register');
+            if (!isAuthAttempt) {
+              localStorage.removeItem('token');
+              localStorage.removeItem('usuario');
+              window.location.href = '/login';
+              iziToast.error({
+                title: 'Sesión expirada',
+                message: 'Por favor, inicia sesión nuevamente',
+              });
+            }
           }
           // Los demás errores (400, 500, etc.) se manejan en los componentes
           // para evitar mensajes duplicados

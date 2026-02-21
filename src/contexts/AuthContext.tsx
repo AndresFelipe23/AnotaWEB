@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { apiService } from '../services/api';
 import type { LoginRequest, RegisterRequest, UsuarioInfo } from '../types/api';
+import { getLoginErrorMessage, getRegisterErrorMessage } from '../utils/authMessages';
 import iziToast from 'izitoast';
 
 interface AuthContextType {
@@ -58,10 +59,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         title: '¡Bienvenido!',
         message: `Hola, ${response.usuario.nombre}`,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = getLoginErrorMessage(error);
       iziToast.error({
-        title: 'Error de inicio de sesión',
-        message: error.response?.data?.message || 'Credenciales inválidas',
+        title: 'Error al iniciar sesión',
+        message,
       });
       throw error;
     }
@@ -77,10 +79,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         title: '¡Registro exitoso!',
         message: `Bienvenido, ${response.usuario.nombre}`,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = getRegisterErrorMessage(error);
       iziToast.error({
-        title: 'Error de registro',
-        message: error.response?.data?.message || 'Error al registrar usuario',
+        title: 'Error al registrarse',
+        message,
       });
       throw error;
     }

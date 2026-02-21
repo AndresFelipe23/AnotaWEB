@@ -6,6 +6,11 @@ interface SidebarProps {
   onToggle: () => void;
 }
 
+const iconClass = (active: boolean) =>
+  `w-5 h-5 flex-shrink-0 transition-colors ${active ? 'text-black' : 'text-gray-500'}`;
+const textClass = (active: boolean) =>
+  `text-sm transition-colors ${active ? 'font-semibold text-gray-900' : 'font-medium text-gray-600'}`;
+
 export const Sidebar = ({ isCollapsed, onToggle }: SidebarProps) => {
   const location = useLocation();
 
@@ -16,18 +21,18 @@ export const Sidebar = ({ isCollapsed, onToggle }: SidebarProps) => {
           isCollapsed ? 'w-16' : 'w-64'
         }`}
       >
-        {/* Navbar dentro del sidebar para que esté por encima */}
+        {/* Header */}
         <div className="h-16 border-b border-gray-200 flex items-center px-4">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center overflow-hidden">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 flex items-center justify-center overflow-hidden shrink-0 rounded-lg bg-gray-100">
               <img src={logoSvg} alt="Anota logo" className="w-7 h-7 object-contain" />
             </div>
-            {!isCollapsed && <h1 className="text-xl font-bold text-black">Anota</h1>}
+            {!isCollapsed && <h1 className="text-xl font-bold text-black truncate">Anota</h1>}
           </div>
         </div>
 
         {/* Navigation Items */}
-        <nav className="p-4 pt-6 space-y-1 overflow-y-auto" style={{ height: 'calc(100vh - 4rem)' }}>
+        <nav className="p-4 pt-6 space-y-0.5 overflow-y-auto" style={{ height: 'calc(100vh - 4rem)' }}>
           <Link
             to="/"
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-100 transition-all duration-200 ${
@@ -35,10 +40,10 @@ export const Sidebar = ({ isCollapsed, onToggle }: SidebarProps) => {
             } ${location.pathname === '/' ? 'bg-gray-100' : ''}`}
             title="Crear Nota Rápida"
           >
-            <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            <svg className={iconClass(location.pathname === '/')} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.897l-2.685.8.8-2.685a4.5 4.5 0 011.897-1.897L16.863 4.487zm0 0L19.5 7.125" />
             </svg>
-            {!isCollapsed && <span className="text-sm font-medium text-gray-700">Crear Nota Rápida</span>}
+            {!isCollapsed && <span className={textClass(location.pathname === '/')}>Crear Nota Rápida</span>}
           </Link>
 
           <Link
@@ -48,10 +53,10 @@ export const Sidebar = ({ isCollapsed, onToggle }: SidebarProps) => {
             } ${location.pathname === '/dashboard' ? 'bg-gray-100' : ''}`}
             title="Dashboard"
           >
-            <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12h4v8H3v-8zm7-6h4v14h-4V6zm7 10h4v4h-4v-4z" />
+            <svg className={iconClass(location.pathname === '/dashboard')} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 8.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
             </svg>
-            {!isCollapsed && <span className="text-sm font-medium text-gray-700">Dashboard</span>}
+            {!isCollapsed && <span className={textClass(location.pathname === '/dashboard')}>Dashboard</span>}
           </Link>
 
           <Link
@@ -61,10 +66,10 @@ export const Sidebar = ({ isCollapsed, onToggle }: SidebarProps) => {
             } ${location.pathname === '/notas-rapidas' ? 'bg-gray-100' : ''}`}
             title="Ver Notas Rápidas"
           >
-            <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            <svg className={iconClass(location.pathname === '/notas-rapidas')} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
             </svg>
-            {!isCollapsed && <span className="text-sm font-medium text-gray-700">Ver Notas Rápidas</span>}
+            {!isCollapsed && <span className={textClass(location.pathname === '/notas-rapidas')}>Notas Rápidas</span>}
           </Link>
 
           <Link
@@ -74,10 +79,10 @@ export const Sidebar = ({ isCollapsed, onToggle }: SidebarProps) => {
             } ${location.pathname === '/notas' ? 'bg-gray-100' : ''}`}
             title="Notas"
           >
-            <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            <svg className={iconClass(location.pathname === '/notas')} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
             </svg>
-            {!isCollapsed && <span className="text-sm font-medium text-gray-700">Notas</span>}
+            {!isCollapsed && <span className={textClass(location.pathname === '/notas')}>Notas</span>}
           </Link>
 
           <Link
@@ -87,10 +92,10 @@ export const Sidebar = ({ isCollapsed, onToggle }: SidebarProps) => {
             } ${location.pathname === '/tareas' ? 'bg-gray-100' : ''}`}
             title="Tareas"
           >
-            <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+            <svg className={iconClass(location.pathname === '/tareas')} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
             </svg>
-            {!isCollapsed && <span className="text-sm font-medium text-gray-700">Tareas</span>}
+            {!isCollapsed && <span className={textClass(location.pathname === '/tareas')}>Tareas</span>}
           </Link>
 
           <Link
@@ -100,10 +105,10 @@ export const Sidebar = ({ isCollapsed, onToggle }: SidebarProps) => {
             } ${location.pathname === '/transcripcion-reunion' ? 'bg-gray-100' : ''}`}
             title="Transcripción de reuniones"
           >
-            <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v7m0-9a7 7 0 0114 0z" />
+            <svg className={iconClass(location.pathname === '/transcripcion-reunion')} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
             </svg>
-            {!isCollapsed && <span className="text-sm font-medium text-gray-700">Transcripción reunión</span>}
+            {!isCollapsed && <span className={textClass(location.pathname === '/transcripcion-reunion')}>Transcripción</span>}
           </Link>
 
           <Link
@@ -113,18 +118,18 @@ export const Sidebar = ({ isCollapsed, onToggle }: SidebarProps) => {
             } ${location.pathname === '/carpetas' ? 'bg-gray-100' : ''}`}
             title="Carpetas"
           >
-            <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+            <svg className={iconClass(location.pathname === '/carpetas')} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
             </svg>
-            {!isCollapsed && <span className="text-sm font-medium text-gray-700">Carpetas</span>}
+            {!isCollapsed && <span className={textClass(location.pathname === '/carpetas')}>Carpetas</span>}
           </Link>
         </nav>
 
         {/* Divider */}
-        <div className="border-t border-gray-200 my-4 mx-4"></div>
+        <div className="border-t border-gray-200 my-4 mx-4" />
 
-        {/* Additional Items */}
-        <nav className="px-4 space-y-1 pb-4">
+        {/* Secondary */}
+        <nav className="px-4 space-y-0.5 pb-4">
           <a
             href="#"
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-100 transition-all duration-200 ${
@@ -132,10 +137,10 @@ export const Sidebar = ({ isCollapsed, onToggle }: SidebarProps) => {
             }`}
             title="Favoritos"
           >
-            <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+            <svg className={iconClass(false)} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
             </svg>
-            {!isCollapsed && <span className="text-sm font-medium text-gray-700">Favoritos</span>}
+            {!isCollapsed && <span className={textClass(false)}>Favoritos</span>}
           </a>
 
           <a
@@ -145,10 +150,10 @@ export const Sidebar = ({ isCollapsed, onToggle }: SidebarProps) => {
             }`}
             title="Archivados"
           >
-            <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+            <svg className={iconClass(false)} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
             </svg>
-            {!isCollapsed && <span className="text-sm font-medium text-gray-700">Archivados</span>}
+            {!isCollapsed && <span className={textClass(false)}>Archivados</span>}
           </a>
         </nav>
       </aside>
