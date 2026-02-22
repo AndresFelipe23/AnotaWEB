@@ -1,5 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+} from 'recharts';
 import { Layout } from './Layout';
 import { apiService } from '../services/api';
 import type { CarpetaArbol, NotaResumen, NotaRapida, Tarea } from '../types/api';
@@ -12,6 +25,9 @@ const FOLDER_COLORS = [
 
 const getFolderColor = (carpeta: CarpetaArbol, index: number) =>
   carpeta.colorHex || FOLDER_COLORS[index % FOLDER_COLORS.length];
+
+/* Colores solo visuales para tarjetas de notas recientes en el dashboard (no se guardan en BD) */
+const DASHBOARD_NOTE_COLORS = ['#f59e0b', '#8b5cf6', '#3b82f6', '#10b981', '#ec4899', '#06b6d4', '#84cc16', '#f97316'];
 
 /* ─── Componente de tarjeta carpeta con forma de folder ─── */
 const FolderCard = ({
@@ -172,6 +188,93 @@ export const DashboardPage = () => {
   const totalTareas = tareasPendientes.length + tareasCompletadas.length;
   const porcentajeCompletadas =
     totalTareas > 0 ? Math.round((tareasCompletadas.length / totalTareas) * 100) : 0;
+
+  /* ─── Datos para gráficos (Recharts) ─── */
+  const chartNotasPorCarpeta = useMemo(() => {
+    const items: { nombre: string; cantidad: number; color: string }[] = [];
+    carpetas.forEach((c, i) => {
+      const count = (notasPorCarpeta.get(c.id) || []).length;
+      if (count > 0) items.push({ nombre: c.nombre, cantidad: count, color: getFolderColor(c, i) });
+    });
+    if (notasSinCarpeta.length > 0) items.push({ nombre: 'Sin carpeta', cantidad: notasSinCarpeta.length, color: '#9ca3af' });
+    return items.sort((a, b) => b.cantidad - a.cantidad).slice(0, 8);
+  }, [carpetas, notasPorCarpeta, notasSinCarpeta.length]);
+
+  const chartTareasPorPrioridad = useMemo(() => {
+    const alta = tareasPendientes.filter((t) => t.prioridad === 1).length;
+    const media = tareasPendientes.filter((t) => t.prioridad === 2).length;
+    const baja = tareasPendientes.filter((t) => t.prioridad !== 1 && t.prioridad !== 2).length;
+    return [
+      { name: 'Alta', cantidad: alta, color: '#ef4444' },
+      { name: 'Media', cantidad: media, color: '#f59e0b' },
+      { name: 'Baja', cantidad: baja, color: '#6b7280' },
+    ];
+  }, [tareasPendientes]);
+
+  const chartActividadNotas = useMemo(() => {
+    const dias: { dia: string; notas: number }[] = [];
+    const hoy = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(hoy);
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      const count = notas.filter((n) => (n.fechaActualizacion || '').slice(0, 10) === key).length;
+      dias.push({
+        dia: d.toLocaleDateString('es-ES', { weekday: 'short', day: '2-digit' }),
+        notas: count,
+      });
+    }
+    return dias;
+  }, [notas]);
+
+  const chartTareasCompletadasPorDia = useMemo(() => {
+    const dias: { dia: string; completadas: number }[] = [];
+    const hoy = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(hoy);
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      const count = tareasCompletadas.filter(
+        (t) => t.fechaCompletada && t.fechaCompletada.slice(0, 10) === key
+      ).length;
+      dias.push({
+        dia: d.toLocaleDateString('es-ES', { weekday: 'short', day: '2-digit' }),
+        completadas: count,
+      });
+    }
+    return dias;
+  }, [tareasCompletadas]);
+
+  const chartTareasPorVencimiento = useMemo(() => {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const finSemana = new Date(hoy);
+    finSemana.setDate(finSemana.getDate() + 7);
+    let hoyCount = 0;
+    let semanaCount = 0;
+    let sinFecha = 0;
+    let vencidas = 0;
+    let despues = 0;
+    tareasPendientes.forEach((t) => {
+      if (!t.fechaVencimiento) {
+        sinFecha++;
+        return;
+      }
+      const v = new Date(t.fechaVencimiento);
+      v.setHours(0, 0, 0, 0);
+      if (v < hoy) vencidas++;
+      else if (v.getTime() === hoy.getTime()) hoyCount++;
+      else if (v <= finSemana) semanaCount++;
+      else despues++;
+    });
+    return [
+      { name: 'Vencidas', value: vencidas, color: '#ef4444' },
+      { name: 'Hoy', value: hoyCount, color: '#f59e0b' },
+      { name: 'Esta semana', value: semanaCount, color: '#3b82f6' },
+      { name: 'Después', value: despues, color: '#8b5cf6' },
+      { name: 'Sin fecha', value: sinFecha, color: '#9ca3af' },
+    ].filter((x) => x.value > 0);
+  }, [tareasPendientes]);
 
   const handleOpenNota = (id: string) => navigate(`/notas?open=${id}`);
 
@@ -394,7 +497,7 @@ export const DashboardPage = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                {notas.slice(0, 8).map((n) => {
+                {notas.slice(0, 8).map((n, index) => {
                   const fecha = new Date(n.fechaActualizacion);
                   const hoy = new Date();
                   const esHoy = fecha.toDateString() === hoy.toDateString();
@@ -406,20 +509,28 @@ export const DashboardPage = () => {
                     : esAyer
                       ? `Ayer, ${fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`
                       : fecha.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+                  const color = DASHBOARD_NOTE_COLORS[index % DASHBOARD_NOTE_COLORS.length];
 
                   return (
                     <button
                       key={n.id}
                       type="button"
                       onClick={() => handleOpenNota(n.id)}
-                      className="group text-left bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden flex flex-col touch-manipulation active:scale-[0.98]"
+                      className="group text-left rounded-2xl border shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden flex flex-col touch-manipulation active:scale-[0.98]"
+                      style={{
+                        borderColor: `${color}40`,
+                        background: `radial-gradient(circle at 0 0, ${color}18, transparent 50%), radial-gradient(circle at 100% 100%, ${color}0c, #fff)`,
+                      }}
                     >
                       {/* Header con icono */}
                       <div className="px-4 pt-4 pb-2 flex items-start justify-between gap-2">
-                        <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-lg group-hover:scale-110 transition-transform duration-200">
+                        <div
+                          className="w-10 h-10 rounded-xl border border-white/60 flex items-center justify-center text-lg group-hover:scale-110 transition-transform duration-200"
+                          style={{ backgroundColor: `${color}20` }}
+                        >
                           {n.icono || '📝'}
                         </div>
-                        <span className="text-[10px] text-gray-400 mt-1 flex-shrink-0">{fechaStr}</span>
+                        <span className="text-[10px] text-gray-500 mt-1 flex-shrink-0">{fechaStr}</span>
                       </div>
 
                       {/* Contenido */}
@@ -428,25 +539,30 @@ export const DashboardPage = () => {
                           {n.titulo || 'Sin título'}
                         </p>
                         {n.resumen ? (
-                          <p className="text-[11px] text-gray-400 line-clamp-2 mt-1.5 leading-relaxed flex-1">
+                          <p className="text-[11px] text-gray-500 line-clamp-2 mt-1.5 leading-relaxed flex-1">
                             {n.resumen}
                           </p>
                         ) : (
-                          <p className="text-[11px] text-gray-300 italic mt-1.5 flex-1">Sin descripción</p>
+                          <p className="text-[11px] text-gray-400 italic mt-1.5 flex-1">Sin descripción</p>
                         )}
 
                         {/* Footer */}
-                        <div className="flex items-center gap-1.5 mt-3 pt-2 border-t border-gray-50">
+                        <div className="flex items-center gap-1.5 mt-3 pt-2 border-t border-gray-100">
                           {n.carpetaId ? (
-                            <span className="text-[10px] text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full truncate max-w-[120px]">
+                            <span className="text-[10px] text-gray-500 px-2 py-0.5 rounded-full truncate max-w-[120px]" style={{ backgroundColor: `${color}15` }}>
                               En carpeta
                             </span>
                           ) : (
-                            <span className="text-[10px] text-gray-300 bg-gray-50 px-2 py-0.5 rounded-full">
+                            <span className="text-[10px] text-gray-400 px-2 py-0.5 rounded-full" style={{ backgroundColor: `${color}10` }}>
                               Sin carpeta
                             </span>
                           )}
                           <div className="flex-1" />
+                          <div
+                            className="w-2.5 h-2.5 rounded-full shrink-0"
+                            style={{ backgroundColor: color }}
+                            title="Color de la tarjeta (solo vista)"
+                          />
                           <svg className="w-3.5 h-3.5 text-gray-300 group-hover:text-gray-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
@@ -621,6 +737,235 @@ export const DashboardPage = () => {
                 </div>
               </div>
             </div>
+          </section>
+
+          {/* ═══ Gráficos ═══ */}
+          <section className="mb-6">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-sm">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-sm font-bold text-gray-900">Resumen visual</h2>
+                <p className="text-[11px] text-gray-500">Gráficos de actividad y distribución</p>
+              </div>
+            </div>
+            {isLoading ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="rounded-2xl border border-gray-100 bg-gray-50/50 overflow-hidden">
+                    <div className="h-4 w-24 bg-gray-200 rounded-lg ml-5 mt-5 animate-pulse" />
+                    <div className="h-52 mt-4 bg-gray-100 animate-pulse" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Notas por carpeta */}
+                <div className="group relative rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden transition-shadow hover:shadow-md">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-400 to-blue-600 opacity-80" />
+                  <div className="pl-5 pr-4 pt-4 pb-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-bold text-gray-900">Notas por carpeta</span>
+                    </div>
+                    <p className="text-[11px] text-gray-500 mb-3">Distribución en tus carpetas</p>
+                  </div>
+                  {chartNotasPorCarpeta.length === 0 ? (
+                    <div className="px-4 pb-6 pt-2 flex flex-col items-center justify-center text-center min-h-[200px]">
+                      <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center mb-2">
+                        <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                        </svg>
+                      </div>
+                      <p className="text-xs text-gray-500">Sin datos aún</p>
+                      <p className="text-[11px] text-gray-400 mt-0.5">Crea carpetas y añade notas</p>
+                    </div>
+                  ) : (
+                    <div className="px-2 pb-4 pt-0">
+                      <ResponsiveContainer width="100%" height={220}>
+                        <BarChart data={chartNotasPorCarpeta} layout="vertical" margin={{ top: 4, right: 12, left: 4, bottom: 4 }}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
+                          <XAxis type="number" tick={{ fontSize: 11, fill: '#6b7280' }} axisLine={false} tickLine={false} />
+                          <YAxis type="category" dataKey="nombre" width={88} tick={{ fontSize: 11, fill: '#374151' }} axisLine={false} tickLine={false} />
+                          <Tooltip
+                            formatter={(v: number) => [v, 'Notas']}
+                            contentStyle={{ fontSize: 12, borderRadius: 12, border: '1px solid #f3f4f6', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
+                            cursor={{ fill: 'rgba(59, 130, 246, 0.06)' }}
+                            labelStyle={{ fontWeight: 600 }}
+                          />
+                          <Bar dataKey="cantidad" radius={[0, 6, 6, 0]} maxBarSize={28}>
+                            {chartNotasPorCarpeta.map((entry, i) => (
+                              <Cell key={i} fill={entry.color} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+                </div>
+
+                {/* Tareas pendientes por prioridad */}
+                <div className="group relative rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden transition-shadow hover:shadow-md">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-rose-400 to-amber-500 opacity-80" />
+                  <div className="pl-5 pr-4 pt-4 pb-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-bold text-gray-900">Tareas por prioridad</span>
+                    </div>
+                    <p className="text-[11px] text-gray-500 mb-3">Pendientes: Alta, Media, Baja</p>
+                  </div>
+                  {tareasPendientes.length === 0 ? (
+                    <div className="px-4 pb-6 pt-2 flex flex-col items-center justify-center text-center min-h-[200px]">
+                      <div className="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center mb-2">
+                        <svg className="w-6 h-6 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2H9a2 2 0 012-2h2z" />
+                        </svg>
+                      </div>
+                      <p className="text-xs text-gray-500">Sin tareas pendientes</p>
+                      <p className="text-[11px] text-gray-400 mt-0.5">Las que añadas aparecerán aquí</p>
+                    </div>
+                  ) : (
+                    <div className="px-2 pb-4 pt-0">
+                      <ResponsiveContainer width="100%" height={220}>
+                        <BarChart data={chartTareasPorPrioridad} margin={{ top: 4, right: 12, left: 4, bottom: 4 }}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
+                          <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#6b7280' }} axisLine={false} tickLine={false} />
+                          <YAxis tick={{ fontSize: 11, fill: '#6b7280' }} axisLine={false} tickLine={false} />
+                          <Tooltip
+                            formatter={(v: number) => [v, 'Tareas']}
+                            contentStyle={{ fontSize: 12, borderRadius: 12, border: '1px solid #f3f4f6', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
+                            cursor={{ fill: 'rgba(244, 63, 94, 0.06)' }}
+                          />
+                          <Bar dataKey="cantidad" radius={[6, 6, 0, 0]} maxBarSize={48}>
+                            {chartTareasPorPrioridad.map((entry, i) => (
+                              <Cell key={i} fill={entry.color} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+                </div>
+
+                {/* Actividad de notas (últimos 7 días) */}
+                <div className="group relative rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden transition-shadow hover:shadow-md">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-sky-400 to-blue-600 opacity-80" />
+                  <div className="pl-5 pr-4 pt-4 pb-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-bold text-gray-900">Notas actualizadas</span>
+                    </div>
+                    <p className="text-[11px] text-gray-500 mb-3">Últimos 7 días</p>
+                  </div>
+                  <div className="px-2 pb-4 pt-0">
+                    <ResponsiveContainer width="100%" height={220}>
+                      <BarChart data={chartActividadNotas} margin={{ top: 4, right: 12, left: 4, bottom: 4 }}>
+                        <defs>
+                          <linearGradient id="barGradientBlue" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#38bdf8" />
+                            <stop offset="100%" stopColor="#3b82f6" />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
+                        <XAxis dataKey="dia" tick={{ fontSize: 11, fill: '#6b7280' }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 11, fill: '#6b7280' }} axisLine={false} tickLine={false} />
+                        <Tooltip
+                          formatter={(v: number) => [v, 'Notas']}
+                          contentStyle={{ fontSize: 12, borderRadius: 12, border: '1px solid #f3f4f6', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
+                          cursor={{ fill: 'rgba(59, 130, 246, 0.08)' }}
+                        />
+                        <Bar dataKey="notas" fill="url(#barGradientBlue)" radius={[6, 6, 0, 0]} maxBarSize={40} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Tareas completadas por día (últimos 7 días) */}
+                <div className="group relative rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden transition-shadow hover:shadow-md">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-emerald-400 to-green-600 opacity-80" />
+                  <div className="pl-5 pr-4 pt-4 pb-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-bold text-gray-900">Tareas completadas</span>
+                    </div>
+                    <p className="text-[11px] text-gray-500 mb-3">Últimos 7 días</p>
+                  </div>
+                  <div className="px-2 pb-4 pt-0">
+                    <ResponsiveContainer width="100%" height={220}>
+                      <BarChart data={chartTareasCompletadasPorDia} margin={{ top: 4, right: 12, left: 4, bottom: 4 }}>
+                        <defs>
+                          <linearGradient id="barGradientGreen" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#34d399" />
+                            <stop offset="100%" stopColor="#10b981" />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
+                        <XAxis dataKey="dia" tick={{ fontSize: 11, fill: '#6b7280' }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 11, fill: '#6b7280' }} axisLine={false} tickLine={false} />
+                        <Tooltip
+                          formatter={(v: number) => [v, 'Completadas']}
+                          contentStyle={{ fontSize: 12, borderRadius: 12, border: '1px solid #f3f4f6', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
+                          cursor={{ fill: 'rgba(16, 185, 129, 0.08)' }}
+                        />
+                        <Bar dataKey="completadas" fill="url(#barGradientGreen)" radius={[6, 6, 0, 0]} maxBarSize={40} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Tareas pendientes por vencimiento (dona) */}
+                <div className="group relative rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden transition-shadow hover:shadow-md lg:col-span-2">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-violet-400 to-purple-600 opacity-80" />
+                  <div className="pl-5 pr-4 pt-4 pb-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-bold text-gray-900">Vencimiento de tareas</span>
+                    </div>
+                    <p className="text-[11px] text-gray-500 mb-3">Pendientes por fecha de vencimiento</p>
+                  </div>
+                  {chartTareasPorVencimiento.length === 0 ? (
+                    <div className="px-4 pb-6 pt-2 flex flex-col items-center justify-center text-center min-h-[220px]">
+                      <div className="w-12 h-12 rounded-2xl bg-violet-50 flex items-center justify-center mb-2">
+                        <svg className="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <p className="text-xs text-gray-500">Sin tareas con fecha</p>
+                      <p className="text-[11px] text-gray-400 mt-0.5">Asigna fechas a tus tareas para ver la distribución</p>
+                    </div>
+                  ) : (
+                    <div className="px-2 pb-4 pt-0">
+                      <ResponsiveContainer width="100%" height={260}>
+                        <PieChart>
+                          <Pie
+                            data={chartTareasPorVencimiento}
+                            dataKey="value"
+                            nameKey="name"
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={64}
+                            outerRadius={92}
+                            paddingAngle={3}
+                            label={({ name, value }) => (
+                              <text fill="#374151" fontSize={11} fontWeight={600}>
+                                {name}: {value}
+                              </text>
+                            )}
+                          >
+                            {chartTareasPorVencimiento.map((entry, i) => (
+                              <Cell key={i} fill={entry.color} stroke="white" strokeWidth={2} />
+                            ))}
+                          </Pie>
+                          <Tooltip
+                            formatter={(v: number) => [v, 'Tareas']}
+                            contentStyle={{ fontSize: 12, borderRadius: 12, border: '1px solid #f3f4f6', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
+                          />
+                          <Legend layout="horizontal" align="center" verticalAlign="bottom" wrapperStyle={{ paddingTop: 8 }} formatter={(value) => <span style={{ fontSize: 11, color: '#4b5563' }}>{value}</span>} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </section>
         </div>
 
