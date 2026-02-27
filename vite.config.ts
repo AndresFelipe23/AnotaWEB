@@ -39,9 +39,11 @@ export default defineConfig({
         categories: ['productivity', 'utilities'],
       },
       workbox: {
+        // El bundle principal incluye Excalidraw (~2.2 MB) → límite en 3 MB
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-        navigateFallback: null, // Deshabilitar navegación fallback para permitir rutas con query params
-        navigateFallbackDenylist: [/^\/api/, /^\/_/, /^\/tareas\?google=/], // Permitir rutas de OAuth callback
+        navigateFallback: null,
+        navigateFallbackDenylist: [/^\/api/, /^\/_/, /^\/tareas\?google=/],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.(?:gstatic|googleapis)\.com\/.*/i,
@@ -59,4 +61,8 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    // El bundle incluye Excalidraw que pesa ~2.2 MB, es esperado
+    chunkSizeWarningLimit: 3000,
+  },
 })

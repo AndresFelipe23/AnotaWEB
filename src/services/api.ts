@@ -21,6 +21,9 @@ import type {
   Etiqueta,
   GoogleTaskList,
   GoogleTask,
+  Pizarra,
+  CrearPizarraRequest,
+  ActualizarPizarraRequest,
 } from '../types/api';
 
 const API_URL =
@@ -310,6 +313,41 @@ class ApiService {
     formData.append('file', audioBlob, 'capture.webm');
     const response = await this.api.post<{ texto: string }>('/api/transcripcion/audio', formData);
     return response.data;
+  }
+
+  // ============ PIZARRAS (EXCALIDRAW) ============
+  async obtenerPizarras(options?: { incluirArchivadas?: boolean; notaId?: string }): Promise<Pizarra[]> {
+    const params: Record<string, string | boolean> = {};
+    if (options?.incluirArchivadas) params.incluirArchivadas = true;
+    if (options?.notaId) params.notaId = options.notaId;
+    const response = await this.api.get<Pizarra[]>('/api/Pizarras', { params });
+    return response.data;
+  }
+
+  async obtenerPizarraPorId(id: string): Promise<Pizarra> {
+    const response = await this.api.get<Pizarra>(`/api/Pizarras/${id}`);
+    return response.data;
+  }
+
+  async crearPizarra(data: CrearPizarraRequest): Promise<{ id: string }> {
+    const response = await this.api.post<{ id: string }>('/api/Pizarras', data);
+    return response.data;
+  }
+
+  async actualizarPizarra(id: string, data: ActualizarPizarraRequest): Promise<void> {
+    await this.api.put(`/api/Pizarras/${id}`, data);
+  }
+
+  async archivarPizarra(id: string): Promise<void> {
+    await this.api.put(`/api/Pizarras/${id}/archivar`);
+  }
+
+  async recuperarPizarra(id: string): Promise<void> {
+    await this.api.put(`/api/Pizarras/${id}/recuperar`);
+  }
+
+  async eliminarPizarra(id: string): Promise<void> {
+    await this.api.delete(`/api/Pizarras/${id}`);
   }
 }
 

@@ -123,6 +123,20 @@ export const Sidebar = ({ isCollapsed, onToggle }: SidebarProps) => {
             </svg>
             {!isCollapsed && <span className={textClass(location.pathname === '/carpetas')}>Carpetas</span>}
           </Link>
+
+          <Link
+            to="/pizarras"
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-100 transition-all duration-200 ${
+              isCollapsed ? 'justify-center' : ''
+            } ${location.pathname.startsWith('/pizarras') ? 'bg-gray-100' : ''}`}
+            title="Pizarras"
+          >
+            <svg className={iconClass(location.pathname.startsWith('/pizarras'))} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <rect x="4" y="5" width="16" height="12" rx="2" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 9h4m-4 3h6" />
+            </svg>
+            {!isCollapsed && <span className={textClass(location.pathname.startsWith('/pizarras'))}>Pizarras</span>}
+          </Link>
         </nav>
 
         {/* Divider */}

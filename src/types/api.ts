@@ -166,3 +166,31 @@ export interface GoogleTask {
   taskListId: string;
   taskListTitle: string;
 }
+
+// Pizarras (Excalidraw)
+export interface Pizarra {
+  id: string;
+  usuarioId: string;
+  notaId?: string | null;
+  titulo: string;
+  descripcion?: string | null;
+  sceneJson: string;
+  esArchivada: boolean;
+  fechaCreacion: string;
+  fechaActualizacion: string;
+}
+
+export interface CrearPizarraRequest {
+  titulo: string;
+  descripcion?: string;
+  sceneJson: string;
+  notaId?: string;
+}
+
+export interface ActualizarPizarraRequest {
+  titulo: string;
+  descripcion?: string;
+  sceneJson: string;
+  notaId?: string | null;
+  esArchivada?: boolean;
+}

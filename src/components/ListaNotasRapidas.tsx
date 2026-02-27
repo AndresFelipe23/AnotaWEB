@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { apiService } from '../services/api';
+import { usePageHeader } from '../contexts/PageHeaderContext';
 import type { NotaRapida, ActualizarNotaRapidaRequest } from '../types/api';
 import iziToast from 'izitoast';
 import { Link } from 'react-router-dom';
@@ -32,12 +34,20 @@ export const ListaNotasRapidas = () => {
   const [isLoadingArchivadas, setIsLoadingArchivadas] = useState(false);
   const [showArchivadasPanel, setShowArchivadasPanel] = useState(false);
   const [notaRestaurandoId, setNotaRestaurandoId] = useState<string | null>(null);
+  const [fabOpen, setFabOpen] = useState(false);
 
+  const navigate = useNavigate();
+  const { setPageHeader } = usePageHeader();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     cargarNotas();
   }, []);
+
+  useEffect(() => {
+    setPageHeader('Notas Rápidas', notas.length);
+    return () => setPageHeader(null);
+  }, [notas.length, setPageHeader]);
 
   const cargarNotas = async () => {
     try {
@@ -307,170 +317,6 @@ export const ListaNotasRapidas = () => {
 
   return (
     <div className="w-full min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
-      {/* Header Compacto */}
-      <div className="flex-shrink-0 border-b-2 border-gray-100 bg-white px-4 sm:px-6 lg:px-8 py-3 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-black" style={{ fontFamily: "'Inter', sans-serif", letterSpacing: '-0.03em' }}>
-              Notas Rápidas
-            </h1>
-            {notas.length > 0 && (
-              <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full border border-gray-200">
-                {notas.length}
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-            <button
-              onClick={handleToggleArchivadasPanel}
-              className={`px-3 sm:px-4 py-2 text-xs font-semibold rounded-xl border transition-all duration-200 flex items-center gap-2 touch-manipulation ${
-                showArchivadasPanel
-                  ? 'bg-gray-900 text-white border-gray-900 shadow-md'
-                  : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-50'
-              }`}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-              </svg>
-              <span>Archivadas</span>
-              {notasArchivadas.length > 0 && (
-                <span className="ml-1 inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/10 border border-white/40 text-[10px]">
-                  {notasArchivadas.length}
-                </span>
-              )}
-            </button>
-            <Link
-              to="/"
-              className="px-4 sm:px-5 py-2.5 text-sm font-bold text-white bg-black rounded-xl hover:bg-gray-900 hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md touch-manipulation"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-              </svg>
-              Nueva
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Panel lateral de notas archivadas */}
-      {showArchivadasPanel && (
-        <div className="fixed inset-0 z-40 flex justify-end">
-          <div
-            className="flex-1 bg-black/30"
-            onClick={() => setShowArchivadasPanel(false)}
-          ></div>
-          <div className="w-full sm:w-[420px] md:w-[460px] lg:w-[500px] h-full bg-white shadow-2xl border-l border-gray-200 flex flex-col">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-              <div>
-                <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-gray-400" style={{ fontFamily: "'Inter', sans-serif" }}>
-                  Notas archivadas
-                </h2>
-                <p className="text-xs text-gray-500 mt-1">
-                  {notasArchivadas.length === 0
-                    ? 'No tienes notas rápidas archivadas'
-                    : `${notasArchivadas.length} nota${notasArchivadas.length > 1 ? 's' : ''} archivada${notasArchivadas.length > 1 ? 's' : ''}`}
-                </p>
-              </div>
-              <button
-                onClick={() => setShowArchivadasPanel(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto scrollbar-hide px-4 py-4 space-y-3 bg-white">
-              {isLoadingArchivadas ? (
-                <div className="flex items-center justify-center h-full text-xs text-gray-500">
-                  Cargando notas archivadas...
-                </div>
-              ) : notasArchivadas.length === 0 ? (
-                <div className="flex items-center justify-center h-full text-center text-xs text-gray-500 px-6">
-                  Cuando archives una nota rápida, la verás aquí para poder recuperarla o eliminarla definitivamente.
-                </div>
-              ) : (
-                notasArchivadas.map((nota) => (
-                  <div
-                    key={nota.id}
-                    className="rounded-2xl bg-white border border-gray-200 px-4 py-3 shadow-sm"
-                  >
-                    <div className="flex items-start gap-3">
-                      {nota.colorHex && (
-                        <span
-                          className="mt-1 w-3 h-3 rounded-full border border-white shadow-sm flex-shrink-0"
-                          style={{ backgroundColor: nota.colorHex }}
-                        />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p
-                          className="text-[13px] text-gray-900 leading-relaxed line-clamp-4"
-                          style={{ fontFamily: "'Inter', sans-serif" }}
-                        >
-                          {nota.contenido}
-                        </p>
-                        <div className="mt-3 flex items-center justify-between text-[11px] text-gray-500">
-                          <div className="inline-flex items-center gap-1.5 rounded-full bg-gray-50 px-2 py-1 border border-gray-200">
-                            <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>{formatFecha(nota.fechaCreacion)}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="mt-3 flex items-center justify-between gap-2">
-                      <button
-                        onClick={() => handleRecuperarNotaArchivada(nota.id)}
-                        disabled={notaRestaurandoId === nota.id}
-                        className="flex-1 px-3 py-2 text-xs font-semibold text-white bg-black rounded-xl hover:bg-gray-900 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                      >
-                        {notaRestaurandoId === nota.id && (
-                          <svg className="w-3.5 h-3.5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                        )}
-                        <span>Recuperar</span>
-                      </button>
-                      <button
-                        onClick={async () => {
-                          if (isDeleting) return;
-                          setIsDeleting(true);
-                          try {
-                            await apiService.eliminarNotaRapida(nota.id);
-                            iziToast.success({
-                              title: 'Eliminada',
-                              message: 'La nota archivada se eliminó permanentemente',
-                              position: 'topRight',
-                            });
-                            await cargarNotasArchivadas();
-                          } catch (error) {
-                            iziToast.error({
-                              title: 'Error',
-                              message: 'No se pudo eliminar la nota archivada',
-                              position: 'topRight',
-                            });
-                          } finally {
-                            setIsDeleting(false);
-                          }
-                        }}
-                        className="px-3 py-2 text-xs font-semibold text-red-600 bg-red-50 rounded-xl hover:bg-red-100 flex items-center gap-1.5"
-                      >
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                        <span>Eliminar</span>
-                      </button>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      )}
       {/* Layout 2 Columnas / Responsive */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden bg-white">
         {/* Sidebar de Notas */}
@@ -757,6 +603,169 @@ export const ListaNotasRapidas = () => {
           )}
         </div>
       </div>
+
+      {/* FAB: Archivadas y Nueva nota */}
+      {fabOpen && (
+        <div className="fixed inset-0 z-20" onClick={() => setFabOpen(false)} aria-hidden="true" />
+      )}
+      <div className="fixed bottom-6 right-6 z-30 flex flex-col items-end gap-3">
+        {fabOpen && (
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setFabOpen(false);
+                handleToggleArchivadasPanel();
+              }}
+              className="flex items-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-xl shadow-lg hover:bg-gray-50 text-gray-800 font-medium text-sm transition-colors touch-manipulation"
+            >
+              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+              </svg>
+              Archivadas
+              {notasArchivadas.length > 0 && (
+                <span className="ml-1 inline-flex items-center justify-center min-w-[20px] h-5 px-1 rounded-full bg-gray-200 text-xs font-semibold">
+                  {notasArchivadas.length}
+                </span>
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setFabOpen(false);
+                navigate('/');
+              }}
+              className="flex items-center gap-2 px-4 py-3 bg-black text-white rounded-xl shadow-lg hover:bg-gray-800 font-medium text-sm transition-colors touch-manipulation"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+              </svg>
+              Nueva
+            </button>
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={() => setFabOpen(!fabOpen)}
+          className="flex items-center justify-center w-14 h-14 rounded-2xl bg-black text-white shadow-lg hover:bg-gray-800 active:scale-95 transition-all touch-manipulation"
+          aria-label={fabOpen ? 'Cerrar menú' : 'Abrir acciones'}
+          aria-expanded={fabOpen}
+        >
+          <svg
+            className={`w-6 h-6 transition-transform duration-200 ${fabOpen ? 'rotate-45' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Modal Notas rápidas archivadas */}
+      {showArchivadasPanel && (
+        <>
+          <div className="fixed inset-0 bg-black/40 z-[200]" onClick={() => setShowArchivadasPanel(false)} aria-hidden="true" />
+          <div className="fixed inset-0 z-[210] flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[85vh] flex flex-col">
+              <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
+                <div>
+                  <h3 className="text-lg font-bold text-gray-800">Notas rápidas archivadas</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {notasArchivadas.length === 0
+                      ? 'No tienes notas rápidas archivadas'
+                      : `${notasArchivadas.length} nota${notasArchivadas.length > 1 ? 's' : ''} archivada${notasArchivadas.length > 1 ? 's' : ''}`}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowArchivadasPanel(false)}
+                  className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 touch-manipulation"
+                  title="Cerrar"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-3 min-h-0 space-y-3">
+                {isLoadingArchivadas ? (
+                  <div className="p-6 text-sm text-gray-500 text-center">Cargando...</div>
+                ) : notasArchivadas.length === 0 ? (
+                  <div className="p-6 text-sm text-gray-500 text-center">
+                    Cuando archives una nota rápida, la verás aquí para recuperarla o eliminarla.
+                  </div>
+                ) : (
+                  notasArchivadas.map((nota) => (
+                    <div
+                      key={nota.id}
+                      className="rounded-2xl bg-white border border-gray-200 px-4 py-3 shadow-sm"
+                    >
+                      <div className="flex items-start gap-3">
+                        {nota.colorHex && (
+                          <span
+                            className="mt-1 w-3 h-3 rounded-full border border-white shadow-sm flex-shrink-0"
+                            style={{ backgroundColor: nota.colorHex }}
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[13px] text-gray-900 leading-relaxed line-clamp-4" style={{ fontFamily: "'Inter', sans-serif" }}>
+                            {nota.contenido}
+                          </p>
+                          <div className="mt-3 flex items-center justify-between text-[11px] text-gray-500">
+                            <div className="inline-flex items-center gap-1.5 rounded-full bg-gray-50 px-2 py-1 border border-gray-200">
+                              <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              <span>{formatFecha(nota.fechaCreacion)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-3 flex items-center justify-between gap-2">
+                        <button
+                          onClick={() => handleRecuperarNotaArchivada(nota.id)}
+                          disabled={notaRestaurandoId === nota.id}
+                          className="flex-1 px-3 py-2 text-xs font-semibold text-white bg-black rounded-xl hover:bg-gray-900 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 touch-manipulation"
+                        >
+                          {notaRestaurandoId === nota.id ? (
+                            <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                            </svg>
+                          ) : null}
+                          <span>Recuperar</span>
+                        </button>
+                        <button
+                          onClick={async () => {
+                            if (isDeleting) return;
+                            setIsDeleting(true);
+                            try {
+                              await apiService.eliminarNotaRapida(nota.id);
+                              iziToast.success({ title: 'Eliminada', message: 'La nota archivada se eliminó permanentemente', position: 'topRight' });
+                              await cargarNotasArchivadas();
+                            } catch {
+                              iziToast.error({ title: 'Error', message: 'No se pudo eliminar la nota archivada', position: 'topRight' });
+                            } finally {
+                              setIsDeleting(false);
+                            }
+                          }}
+                          className="px-3 py-2 text-xs font-semibold text-red-600 bg-red-50 rounded-xl hover:bg-red-100 flex items-center gap-1.5 touch-manipulation"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                          <span>Eliminar</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

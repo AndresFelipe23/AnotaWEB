@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { usePageHeader } from '../contexts/PageHeaderContext';
 import { apiService } from '../services/api';
 import type { NotaResumen } from '../types/api';
 
@@ -11,6 +12,7 @@ interface NavbarProps {
 
 export const Navbar = ({ onMenuClick, isSidebarCollapsed = false }: NavbarProps) => {
   const { usuario, logout } = useAuth();
+  const { pageHeader } = usePageHeader();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -74,7 +76,7 @@ export const Navbar = ({ onMenuClick, isSidebarCollapsed = false }: NavbarProps)
       }`}
     >
       <div className="flex items-center justify-between h-full px-3 sm:px-4 md:px-6 gap-2">
-        {/* Left: Menu Button + Logo on mobile */}
+        {/* Left: Menu Button + Page title (e.g. Notas + count) or Logo on mobile */}
         <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           <button
             onClick={onMenuClick}
@@ -85,7 +87,20 @@ export const Navbar = ({ onMenuClick, isSidebarCollapsed = false }: NavbarProps)
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <span className="lg:hidden text-base font-bold text-black truncate">Anota</span>
+          {pageHeader.title ? (
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-base sm:text-lg font-bold text-black truncate" style={{ fontFamily: "'Inter', sans-serif", letterSpacing: '-0.02em' }}>
+                {pageHeader.title}
+              </span>
+              {pageHeader.count != null && pageHeader.count > 0 && (
+                <span className="flex-shrink-0 px-2.5 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full border border-gray-200">
+                  {pageHeader.count}
+                </span>
+              )}
+            </div>
+          ) : (
+            <span className="lg:hidden text-base font-bold text-black truncate">Anota</span>
+          )}
         </div>
 
         {/* Right: Search, User, Actions */}

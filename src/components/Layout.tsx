@@ -5,9 +5,11 @@ import { Navbar } from './Navbar';
 
 interface LayoutProps {
   children: ReactNode;
+  hideNavbar?: boolean;
+  hideSidebar?: boolean;
 }
 
-export const Layout = ({ children }: LayoutProps) => {
+export const Layout = ({ children, hideNavbar = false, hideSidebar = false }: LayoutProps) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
     const stored = window.localStorage.getItem('anota_sidebar_collapsed');
@@ -29,18 +31,24 @@ export const Layout = ({ children }: LayoutProps) => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
+  const topPaddingClass = hideNavbar ? 'pt-0' : 'pt-14 sm:pt-16';
+
   return (
     <div className="min-h-screen bg-white">
       {/* Desktop Sidebar */}
-      <div className="hidden lg:block">
-        <Sidebar isCollapsed={isSidebarCollapsed} onToggle={toggleSidebar} />
-      </div>
+      {!hideSidebar && (
+        <div className="hidden lg:block">
+          <Sidebar isCollapsed={isSidebarCollapsed} onToggle={toggleSidebar} />
+        </div>
+      )}
 
       {/* Navbar */}
-      <Navbar onMenuClick={toggleMobileMenu} isSidebarCollapsed={isSidebarCollapsed} />
+      {!hideNavbar && (
+        <Navbar onMenuClick={toggleMobileMenu} isSidebarCollapsed={isSidebarCollapsed} />
+      )}
 
       {/* Mobile Sidebar Overlay */}
-      {isMobileMenuOpen && (
+      {isMobileMenuOpen && !hideSidebar && (
         <>
           <div
             className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -103,16 +111,23 @@ export const Layout = ({ children }: LayoutProps) => {
                 </svg>
                 <span className="text-sm font-medium text-gray-700">Carpetas</span>
               </Link>
+              <Link to="/pizarras" onClick={toggleMobileMenu} className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-100 active:bg-gray-50 transition-colors">
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <rect x="4" y="5" width="16" height="12" rx="2" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 9h4m-4 3h6" />
+                </svg>
+                <span className="text-sm font-medium text-gray-700">Pizarras</span>
+              </Link>
             </nav>
           </aside>
         </>
       )}
 
-      <div className="flex pt-14 sm:pt-16">
+      <div className={`flex ${topPaddingClass}`}>
         {/* Main Content */}
         <main
           className={`flex-1 min-w-0 transition-all duration-300 overflow-x-hidden ${
-            isSidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
+            hideSidebar ? '' : isSidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
           }`}
         >
           {children}

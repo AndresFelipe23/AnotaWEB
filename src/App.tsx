@@ -1,5 +1,6 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
+import { PageHeaderProvider } from './contexts/PageHeaderContext';
 import { Login } from './components/Login';
 import { Register } from './components/Register';
 import { Home } from './components/Home';
@@ -12,6 +13,8 @@ import { MeetingTranscriberPage } from './components/MeetingTranscriberPage';
 import { LandingPage } from './components/LandingPage';
 import { PoliticaPrivacidad } from './components/PoliticaPrivacidad';
 import { CondicionesServicio } from './components/CondicionesServicio';
+import { PizarrasPage } from './components/PizarrasPage';
+import { PizarraEditorPage } from './components/PizarraEditorPage';
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -44,16 +47,22 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </>
         ) : (
-          <>
+          <Route element={
+            <PageHeaderProvider>
+              <Outlet />
+            </PageHeaderProvider>
+          }>
             <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/notas-rapidas" element={<NotasRapidasPage />} />
             <Route path="/notas" element={<NotasPage />} />
+            <Route path="/pizarras" element={<PizarrasPage />} />
+            <Route path="/pizarras/:id" element={<PizarraEditorPage />} />
             <Route path="/carpetas" element={<CarpetasPage />} />
             <Route path="/tareas" element={<TareasPage />} />
             <Route path="/transcripcion-reunion" element={<MeetingTranscriberPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
-          </>
+          </Route>
         )}
       </Routes>
     </BrowserRouter>
