@@ -5,9 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npx tsc -b && npx vite build",
+    "build": "NODE_OPTIONS=--max-old-space-size=4096 npx tsc -b && npx vite build",
     "lint": "eslint .",
     "preview": "vite preview"
+  },
+  "engines": {
+    "node": ">=20.19.0 || >=22.12.0"
   },
   "dependencies": {
     "@editorjs/checklist": "^1.6.0",
